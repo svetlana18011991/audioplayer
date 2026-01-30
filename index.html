@@ -1,462 +1,237 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Genially Audio Player Builder</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Audio Player Widget Editor (for Genially)</title>
   <style>
     :root{
-      --bg: transparent;
-      --panel: rgba(15,16,22,.35);
-      --panel2: rgba(15,16,22,.18);
-      --text: #ffffff;
-      --muted: rgba(255,255,255,.7);
-      --accent: #ff2bd6;
-      --accent2: #7c3aed;
-      --btn: rgba(255,255,255,.12);
-      --btnHover: rgba(255,255,255,.18);
-      --stroke: rgba(255,255,255,.16);
-      --shadow: 0 18px 60px rgba(0,0,0,.45);
-      --radius: 18px;
-      --radius2: 26px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      --bg:#0000;
+      --panel:#12121acc;
+      --text:#f5f5ff;
+      --muted:#b9b9d3;
+      --line:#ffffff1f;
+      --accent:#b33bff;
+      --accent2:#7a2bff;
+      --chip:#ffffff14;
+      --shadow: 0 18px 55px rgba(0,0,0,.35);
+      --radius:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
     }
 
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: var(--font);
-      background: #0b0c10;
-      color: #fff;
+      font-family:var(--sans);
+      background: radial-gradient(900px 500px at 20% 10%, rgba(179,59,255,.25), transparent 60%),
+                  radial-gradient(900px 500px at 80% 90%, rgba(122,43,255,.18), transparent 60%),
+                  #0b0b12;
+      color:var(--text);
     }
+
     .wrap{
       max-width: 1200px;
-      margin: 0 auto;
-      padding: 18px;
-      display: grid;
+      margin: 24px auto;
+      padding: 0 16px 28px;
+      display:grid;
       grid-template-columns: 420px 1fr;
-      gap: 16px;
-    }
-    @media (max-width: 980px){
-      .wrap{ grid-template-columns: 1fr; }
+      gap:16px;
     }
 
     .card{
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.35);
-      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
+
     .card h2{
       margin:0;
-      padding: 14px 14px 10px;
-      font-size: 14px;
-      letter-spacing: .2px;
-      color: rgba(255,255,255,.9);
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.08);
+      padding:14px 16px;
+      font-size:14px;
+      letter-spacing:.3px;
+      text-transform:uppercase;
+      border-bottom:1px solid var(--line);
+      color: #eaeaff;
     }
-    .card .content{ padding: 14px; }
+
+    .card .content{ padding: 14px 16px; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
 
     label{
-      display: block;
-      font-size: 12px;
-      color: rgba(255,255,255,.8);
-      margin-bottom: 6px;
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin: 0 0 6px;
     }
-    input[type="text"], textarea, select{
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
-      color: #fff;
-      padding: 10px 10px;
-      outline: none;
-      font-size: 13px;
-      box-sizing: border-box;
+    input[type="text"], input[type="url"], select, textarea{
+      width:100%;
+      box-sizing:border-box;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#0f0f18;
+      color:var(--text);
+      outline:none;
     }
-    textarea{ min-height: 120px; resize: vertical; }
-
-    .row{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .row3{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    textarea{ min-height: 84px; resize: vertical; font-family: var(--mono); font-size:12px; }
+    input[type="color"]{
+      width:100%;
+      height:40px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#0f0f18;
+      padding:4px;
+      box-sizing:border-box;
+    }
+    .row{ display:flex; gap:10px; align-items:center; }
+    .row > *{ flex:1; }
     .hint{
-      margin-top: 6px;
-      font-size: 11px;
-      color: rgba(255,255,255,.65);
+      font-size:12px;
+      color: var(--muted);
       line-height: 1.35;
+      margin-top: 8px;
+      opacity:.95;
     }
-    .btns{ display:flex; gap:10px; flex-wrap: wrap; margin-top: 12px; }
-    button{
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.10);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 13px;
-      transition: .15s ease;
-    }
-    button:hover{ background: rgba(255,255,255,.16); }
-    button.primary{
-      background: linear-gradient(135deg, rgba(255,43,214,.95), rgba(124,58,237,.95));
-      border: none;
-    }
-    button.primary:hover{ filter: brightness(1.05); }
-    .small{ font-size: 12px; padding: 8px 10px; border-radius: 10px; }
 
-    .previewBox{
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; }
+    button{
+      cursor:pointer;
+      border:none;
+      border-radius:14px;
+      padding:10px 12px;
+      font-weight:700;
+      color:#fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 10px 28px rgba(179,59,255,.24);
+    }
+    button.secondary{
+      background: #ffffff12;
+      box-shadow:none;
+      border:1px solid var(--line);
+      color: var(--text);
+      font-weight:600;
+    }
+    button:active{ transform: translateY(1px); }
+
+    .previewStage{
+      padding: 16px;
       display:flex;
       justify-content:center;
       align-items:center;
-      padding: 18px;
-      background: radial-gradient(1200px 700px at 50% 20%, rgba(124,58,237,.28), transparent 60%),
-                  radial-gradient(900px 600px at 50% 70%, rgba(255,43,214,.20), transparent 55%),
-                  rgba(0,0,0,.18);
-      min-height: 640px;
-    }
-    .codeBox{
-      width: 100%;
-      min-height: 220px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12px;
-      line-height: 1.35;
-      white-space: pre;
-    }
-
-    /* --- Player (preview + embed) --- */
-    .ap-root{
-      width: 340px;
-      max-width: 100%;
-      background: var(--bg);
-    }
-    .ap-shell{
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      border: 1px solid var(--stroke);
-      background: linear-gradient(180deg, rgba(124,58,237,.36), rgba(255,43,214,.14));
-      position: relative;
-      overflow: hidden;
-    }
-    .ap-shell::before{
-      content:"";
-      position:absolute; inset:-80px;
+      min-height: 360px;
       background:
-        radial-gradient(220px 220px at 30% 20%, rgba(255,43,214,.55), transparent 60%),
-        radial-gradient(260px 260px at 70% 15%, rgba(124,58,237,.55), transparent 62%),
-        radial-gradient(420px 360px at 50% 85%, rgba(10,12,18,.75), transparent 60%);
-      filter: blur(10px);
-      opacity: .95;
-      pointer-events: none;
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 16px 16px,
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 16px 16px,
+        transparent;
     }
 
-    .ap-inner{ position: relative; padding: 14px 14px 16px; }
-    .ap-top{
-      display:flex; align-items:center; justify-content:space-between;
-      gap: 10px;
+    .codeBox{
+      display:none;
+      padding: 0;
     }
-    .ap-pill{
-      display:inline-flex; gap:8px; align-items:center;
+    .codeTop{
+      display:flex; gap:10px; align-items:center;
+      padding: 12px 16px;
+      border-bottom:1px solid var(--line);
+    }
+    .codeTop strong{ font-size:13px; }
+    .codeTop .grow{ flex:1; }
+    .codeArea{
+      width:100%;
+      min-height: 320px;
+      border:0;
+      outline:none;
+      padding: 14px 16px;
+      background:#0b0b12;
+      color:#eaeaff;
+      font-family:var(--mono);
+      font-size:12px;
+      line-height:1.45;
+      box-sizing:border-box;
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
       padding: 8px 10px;
       border-radius: 999px;
-      background: rgba(0,0,0,.20);
-      border: 1px solid rgba(255,255,255,.12);
-      color: var(--text);
-      font-size: 12px;
-    }
-    .ap-iconbtn{
-      width: 38px; height: 38px;
-      border-radius: 999px;
-      display:grid; place-items:center;
-      background: var(--btn);
-      border: 1px solid rgba(255,255,255,.14);
-      cursor: pointer;
-      user-select: none;
-    }
-    .ap-iconbtn:hover{ background: var(--btnHover); }
-
-    .ap-coverWrap{
-      margin-top: 16px;
-      display:grid; place-items:center;
-    }
-    .ap-cover{
-      width: 170px; height: 170px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
-      position: relative;
-      display:grid; place-items:center;
-      overflow:hidden;
-    }
-    .ap-cover img{
-      width: 100%; height: 100%;
-      object-fit: cover;
-      opacity: .95;
-      transform: scale(1.03);
-    }
-    .ap-cover::after{
-      content:"";
-      position:absolute; inset:0;
-      background: radial-gradient(90px 90px at 50% 50%, rgba(0,0,0,.0), rgba(0,0,0,.35));
-      pointer-events:none;
-    }
-    .ap-note{
-      position:absolute;
-      width: 64px; height: 64px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.20);
-      border: 1px solid rgba(255,255,255,.14);
-      display:grid; place-items:center;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 12px 30px rgba(0,0,0,.25);
-    }
-    .ap-title{
-      margin-top: 14px;
-      text-align:center;
-    }
-    .ap-title .t1{
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: .2px;
-      line-height: 1.2;
-      padding: 0 6px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .ap-title .t2{
-      margin-top: 4px;
-      font-size: 12px;
+      background: var(--chip);
+      border: 1px solid var(--line);
+      font-size:12px;
       color: var(--muted);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      padding: 0 10px;
-    }
-
-    .ap-progress{
-      margin-top: 14px;
-      padding: 10px;
-      border-radius: var(--radius);
-      background: rgba(0,0,0,.16);
-      border: 1px solid rgba(255,255,255,.12);
-    }
-    .ap-bar{
-      height: 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.12);
-      position: relative;
-      overflow:hidden;
-      cursor: pointer;
-    }
-    .ap-bar > .ap-fill{
-      height: 100%;
-      width: 0%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-    }
-    .ap-time{
-      display:flex; justify-content:space-between;
-      margin-top: 8px;
-      font-size: 11px;
-      color: rgba(255,255,255,.75);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .ap-controls{
-      margin-top: 12px;
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 12px 10px;
-      border-radius: var(--radius);
-      background: rgba(0,0,0,.14);
-      border: 1px solid rgba(255,255,255,.12);
-    }
-    .ap-play{
-      width: 54px; height: 54px;
-      border-radius: 999px;
-      display:grid; place-items:center;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 12px 30px rgba(0,0,0,.25);
-    }
-    .ap-play svg{ transform: translateX(1px); }
-    .ap-subbtn{
-      width: 40px; height: 40px;
-      border-radius: 999px;
-      display:grid; place-items:center;
-      background: rgba(255,255,255,.10);
-      border: 1px solid rgba(255,255,255,.14);
-      cursor: pointer;
-    }
-    .ap-subbtn:hover{ background: rgba(255,255,255,.16); }
-
-    .ap-bottom{
-      margin-top: 12px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap: 10px;
-    }
-    .ap-toggle{
-      display:flex; align-items:center; gap: 8px;
-      padding: 10px 12px;
-      border-radius: 999px;
-      background: rgba(0,0,0,.16);
-      border: 1px solid rgba(255,255,255,.12);
-      font-size: 12px;
-      color: rgba(255,255,255,.86);
-      cursor: pointer;
-      user-select: none;
-    }
-    .ap-toggle.on{
-      background: rgba(255,255,255,.12);
-      border-color: rgba(255,255,255,.18);
-      box-shadow: 0 10px 24px rgba(0,0,0,.18);
-    }
-    .ap-badge{
-      width: 10px; height: 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.25);
-    }
-    .ap-toggle.on .ap-badge{
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-    }
-
-    .ap-playlist{
       margin-top: 10px;
-      border-radius: var(--radius);
-      background: rgba(0,0,0,.14);
-      border: 1px solid rgba(255,255,255,.12);
-      overflow: hidden;
-      display:none;
     }
-    .ap-playlist.open{ display:block; }
-    .ap-pl-head{
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 10px 12px;
-      font-size: 12px;
-      color: rgba(255,255,255,.86);
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.08);
-    }
-    .ap-list{
-      max-height: 190px;
-      overflow:auto;
-    }
-    .ap-item{
-      padding: 10px 12px;
-      display:flex; gap:10px;
-      align-items:center;
-      cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .ap-item:last-child{ border-bottom:none; }
-    .ap-item:hover{ background: rgba(255,255,255,.06); }
-    .ap-item.active{ background: rgba(255,255,255,.08); }
-    .ap-item .num{
-      width: 22px; height: 22px;
-      border-radius: 999px;
-      display:grid; place-items:center;
-      background: rgba(255,255,255,.10);
-      border: 1px solid rgba(255,255,255,.12);
-      font-size: 11px;
-      color: rgba(255,255,255,.85);
-      flex: 0 0 auto;
-    }
-    .ap-item .meta{
-      min-width: 0;
-      flex: 1 1 auto;
-    }
-    .ap-item .meta .name{
-      font-size: 12px;
-      color: rgba(255,255,255,.90);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .ap-item .meta .sub{
-      margin-top: 2px;
-      font-size: 11px;
-      color: rgba(255,255,255,.65);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .pill b{ color: var(--text); font-weight:700; }
 
-    .ap-vis{
-      margin-top: 10px;
-      width: 100%;
-      height: 54px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.14);
-      border: 1px solid rgba(255,255,255,.10);
-      overflow:hidden;
-      position: relative;
-    }
-    .ap-vis canvas{
-      width: 100%;
-      height: 100%;
-      display:block;
-      opacity: .95;
-    }
-
-    .warn{
-      color: rgba(255,220,120,.95);
-      font-size: 12px;
-      line-height: 1.35;
-      background: rgba(255,220,120,.08);
-      border: 1px solid rgba(255,220,120,.22);
-      padding: 10px 12px;
-      border-radius: 14px;
+    @media (max-width: 980px){
+      .wrap{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <h2>Настройки / Источник треков</h2>
+      <h2>Настройки</h2>
       <div class="content">
-        <label>Язык интерфейса</label>
-        <select id="lang">
-          <option value="ru" selected>Русский</option>
-          <option value="en">English</option>
-        </select>
+        <div class="grid">
+          <div>
+            <label>Язык интерфейса</label>
+            <select id="lang">
+              <option value="ru" selected>Русский</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div>
+            <label>Показывать ползунок громкости</label>
+            <select id="showVolume">
+              <option value="1" selected>Да</option>
+              <option value="0">Нет</option>
+            </select>
+          </div>
 
-        <div style="height:12px"></div>
+          <div>
+            <label>Акцент (кнопки/ползунки)</label>
+            <input id="accent" type="color" value="#b33bff">
+          </div>
+          <div>
+            <label>Второй цвет градиента</label>
+            <input id="accent2" type="color" value="#7a2bff">
+          </div>
 
-        <label>GitHub папка (публичный репозиторий)</label>
-        <input id="ghFolder" type="text" placeholder="https://github.com/svetlana18011991/audioplayer/tree/main/tracks"/>
-        <div class="hint">
-          Формат: <code>https://github.com/&lt;user&gt;/&lt;repo&gt;/tree/&lt;branch&gt;/&lt;path&gt;</code><br/>
-          Код сам достанет список аудиофайлов через GitHub API и возьмёт raw <code>download_url</code>.
+          <div>
+            <label>Цвет текста</label>
+            <input id="textColor" type="color" value="#ffffff">
+          </div>
+          <div>
+            <label>Цвет “вторичного” текста</label>
+            <input id="mutedColor" type="color" value="#c7c7e6">
+          </div>
+
+          <div>
+            <label>Радиус скругления (px)</label>
+            <input id="radius" type="text" value="22">
+          </div>
+          <div>
+            <label>Высота виджета (px)</label>
+            <input id="height" type="text" value="220">
+          </div>
         </div>
 
         <div style="height:12px"></div>
 
-        <label>ИЛИ raw-ссылки на файлы (по одной на строку)</label>
-        <textarea id="rawLinks" placeholder="https://raw.githubusercontent.com/.../track1.mp3&#10;https://raw.githubusercontent.com/.../track2.mp3"></textarea>
-
-        <div style="height:12px"></div>
-
-        <label>Обложка (URL картинки)</label>
-        <input id="coverUrl" type="text" placeholder="https://.../cover.jpg"/>
-
-        <div style="height:12px"></div>
-
-        <div class="row3">
-          <div>
-            <label>Accent 1</label>
-            <input id="accent" type="text" value="#ff2bd6"/>
-            <div class="hint">Можно hex: #ff00aa</div>
-          </div>
-          <div>
-            <label>Accent 2</label>
-            <input id="accent2" type="text" value="#7c3aed"/>
-            <div class="hint">Градиент</div>
-          </div>
-          <div>
-            <label>Текст</label>
-            <input id="textColor" type="text" value="#ffffff"/>
-            <div class="hint">Цвет текста</div>
+        <div>
+          <label>Ссылка на папку в GitHub (tree/…/path)</label>
+          <input id="githubFolder" type="url" value="https://github.com/svetlana18011991/audioplayer/tree/main/audio">
+          <div class="hint">
+            Плеер сам подгрузит список аудиофайлов из папки через GitHub API и будет играть по ссылкам <b>download_url</b>.
+            Поддержка: mp3, ogg, wav, m4a.
           </div>
         </div>
 
@@ -464,731 +239,978 @@
 
         <div class="row">
           <div>
-            <label>Кнопки (фон)</label>
-            <input id="btnBg" type="text" value="rgba(255,255,255,.12)"/>
+            <label>Картинка (URL) — круглый арт</label>
+            <input id="coverUrl" type="url" value="https://images.unsplash.com/photo-1520975958225-2d2f8a6f0bd0?auto=format&fit=crop&w=600&q=60">
           </div>
           <div>
-            <label>Обводка</label>
-            <input id="stroke" type="text" value="rgba(255,255,255,.16)"/>
+            <label>…или загрузить файл</label>
+            <input id="coverFile" type="file" accept="image/*">
           </div>
         </div>
 
-        <div style="height:12px"></div>
-
-        <div class="row">
-          <div>
-            <label>Прозрачный фон?</label>
-            <select id="transparent">
-              <option value="yes" selected>Да (рекомендовано для Genially)</option>
-              <option value="no">Нет (для теста)</option>
-            </select>
-          </div>
-          <div>
-            <label>Размер (ширина)</label>
-            <select id="width">
-              <option value="300">300px</option>
-              <option value="320">320px</option>
-              <option value="340" selected>340px</option>
-              <option value="360">360px</option>
-              <option value="420">420px</option>
-            </select>
-          </div>
+        <div class="pill">
+          Плеер для Genially будет с <b>прозрачным фоном</b>, как ты просила.
         </div>
-
-        <div style="height:12px"></div>
 
         <div class="btns">
-          <button class="primary" id="btnLoad">Загрузить треки</button>
-          <button id="btnApply">Обновить предпросмотр</button>
-          <button id="btnGetCode">Получить код</button>
-          <button id="btnCopy" class="small">Скопировать код</button>
+          <button id="apply">Обновить предпросмотр</button>
+          <button id="getCode" class="secondary">Получить код для Genially</button>
+          <button id="copyCode" class="secondary" style="display:none">Копировать код</button>
         </div>
 
-        <div style="height:12px"></div>
-        <div id="status" class="hint"></div>
-
-        <div style="height:12px"></div>
-        <div class="warn">
-          Если репозиторий приватный — GitHub API без токена не отдаст файлы.<br/>
-          В таком случае используй raw-ссылки или сделай репозиторий публичным.
+        <div class="hint" style="margin-top:12px">
+          В Genially обычно вставляют код в “Insert → Other → Embed / iFrame”.
+          Если Genially ругается на inline-script, используй “вставку через iframe” (ниже в коде уже всё готово).
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h2>Предпросмотр / Код для Genially</h2>
-      <div class="content">
-        <div class="previewBox">
-          <div id="previewHost"></div>
-        </div>
+      <h2>Предпросмотр</h2>
+      <div class="previewStage">
+        <div id="previewHost"></div>
+      </div>
 
-        <label style="margin-top:14px;">Сгенерированный код (вставляй в Genially как HTML)</label>
-        <textarea id="codeOut" class="codeBox" spellcheck="false"></textarea>
-        <div class="hint">
-          В Genially обычно: <b>Insert → Other → HTML</b> (или аналогичный блок “HTML”).<br/>
-          Если Genially режет &lt;script&gt; внутри, самый надёжный вариант — вставить код в iframe (я скажу как, если нужно).
+      <div class="codeBox" id="codeBox">
+        <div class="codeTop">
+          <strong>Код для вставки в Genially</strong>
+          <div class="grow"></div>
+          <button id="closeCode" class="secondary">Закрыть</button>
         </div>
+        <textarea class="codeArea" id="codeArea" spellcheck="false"></textarea>
       </div>
     </div>
   </div>
 
 <script>
-/* ===========================
-   Builder (Editor) logic
-=========================== */
+/**
+ * Редактор генерирует "player-only" код (без UI редактора).
+ * Внутри: web-component <am-audioplayer> + конфиг JSON.
+ * Без внешних библиотек.
+ */
 
-const $ = (id)=>document.getElementById(id);
+const els = {
+  lang:        document.getElementById('lang'),
+  showVolume:  document.getElementById('showVolume'),
+  accent:      document.getElementById('accent'),
+  accent2:     document.getElementById('accent2'),
+  textColor:   document.getElementById('textColor'),
+  mutedColor:  document.getElementById('mutedColor'),
+  radius:      document.getElementById('radius'),
+  height:      document.getElementById('height'),
+  githubFolder:document.getElementById('githubFolder'),
+  coverUrl:    document.getElementById('coverUrl'),
+  coverFile:   document.getElementById('coverFile'),
 
-const DEFAULT_COVER = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
-  <defs>
-    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#ff2bd6"/>
-      <stop offset="1" stop-color="#7c3aed"/>
-    </linearGradient>
-  </defs>
-  <rect width="600" height="600" fill="url(#g)"/>
-  <circle cx="300" cy="300" r="190" fill="rgba(0,0,0,.18)"/>
-  <path d="M335 200v190c0 28-23 50-51 50s-51-22-51-50 23-50 51-50c10 0 20 3 28 8V200l140-30v120l-117 25z"
-        fill="rgba(255,255,255,.85)"/>
-</svg>`);
+  apply:       document.getElementById('apply'),
+  getCode:     document.getElementById('getCode'),
+  copyCode:    document.getElementById('copyCode'),
 
-function sanitizeColor(v, fallback){
-  if(!v) return fallback;
-  return String(v).trim() || fallback;
-}
-function formatTime(sec){
-  if(!isFinite(sec) || sec < 0) return "0:00";
-  const m = Math.floor(sec/60);
-  const s = Math.floor(sec%60);
-  return `${m}:${String(s).padStart(2,"0")}`;
-}
+  previewHost: document.getElementById('previewHost'),
+  codeBox:     document.getElementById('codeBox'),
+  codeArea:    document.getElementById('codeArea'),
+  closeCode:   document.getElementById('closeCode'),
+};
 
-function parseGithubFolderUrl(url){
-  // https://github.com/user/repo/tree/branch/path/to/folder
+let coverDataUrl = null;
+
+els.coverFile.addEventListener('change', async () => {
+  const file = els.coverFile.files?.[0];
+  if (!file) return;
+  coverDataUrl = await fileToDataURL(file);
+  els.coverUrl.value = '';
+  renderPreview();
+});
+
+els.apply.addEventListener('click', renderPreview);
+
+els.getCode.addEventListener('click', () => {
+  const cfg = getConfig();
+  const code = buildGeniallyEmbedCode(cfg);
+  els.codeArea.value = code;
+  els.codeBox.style.display = 'block';
+  els.copyCode.style.display = 'inline-flex';
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+});
+
+els.closeCode.addEventListener('click', () => {
+  els.codeBox.style.display = 'none';
+  els.copyCode.style.display = 'none';
+});
+
+els.copyCode.addEventListener('click', async () => {
   try{
-    const u = new URL(url);
-    if(u.hostname !== "github.com") return null;
-    const parts = u.pathname.split("/").filter(Boolean);
-    if(parts.length < 5) return null;
-    const [owner, repo, treeWord, branch, ...pathParts] = parts;
-    if(treeWord !== "tree") return null;
-    return { owner, repo, branch, path: pathParts.join("/") };
-  }catch(e){ return null; }
-}
-
-async function fetchGithubFolderAudio(url){
-  const info = parseGithubFolderUrl(url);
-  if(!info) throw new Error("Неверный формат GitHub folder URL");
-  const {owner, repo, branch, path} = info;
-
-  const api = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`;
-  const r = await fetch(api, { headers: { "Accept":"application/vnd.github+json" }});
-  if(!r.ok){
-    const txt = await r.text().catch(()=> "");
-    throw new Error(`GitHub API error ${r.status}. ${txt}`);
+    await navigator.clipboard.writeText(els.codeArea.value);
+    els.copyCode.textContent = 'Скопировано ✓';
+    setTimeout(()=> els.copyCode.textContent = 'Копировать код', 1200);
+  }catch(e){
+    alert('Не удалось скопировать автоматически. Скопируй вручную из окна кода.');
   }
-  const data = await r.json();
-  if(!Array.isArray(data)) throw new Error("Похоже, это не папка (GitHub API не вернул массив).");
+});
 
-  const audioExt = [".mp3",".wav",".ogg",".m4a",".aac",".flac"];
-  const files = data
-    .filter(x => x && x.type === "file" && x.name)
-    .filter(x => audioExt.some(ext => x.name.toLowerCase().endsWith(ext)))
-    .map((x, i)=>({
-      title: x.name.replace(/\.[^.]+$/,""),
-      subtitle: `${owner}/${repo}`,
-      url: x.download_url,
-      cover: null
-    }));
-
-  if(!files.length) throw new Error("В папке не найдено аудиофайлов (mp3/wav/ogg/m4a/...).");
-  return files;
-}
-
-function parseRawLinks(text){
-  const lines = (text || "").split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  const audioExt = [".mp3",".wav",".ogg",".m4a",".aac",".flac"];
-  const out = [];
-  for(const line of lines){
-    try{
-      const u = new URL(line);
-      const name = decodeURIComponent(u.pathname.split("/").pop() || "track");
-      const ok = audioExt.some(ext => name.toLowerCase().endsWith(ext));
-      if(!ok) continue;
-      out.push({
-        title: name.replace(/\.[^.]+$/,""),
-        subtitle: u.hostname,
-        url: line,
-        cover: null
-      });
-    }catch(e){ /* ignore */ }
-  }
-  return out;
-}
-
-function getConfigFromUI(){
-  const lang = $("lang").value;
-  const transparent = $("transparent").value === "yes";
-  const width = parseInt($("width").value, 10) || 340;
-
-  const cfg = {
-    lang,
-    width,
-    transparent,
+function getConfig(){
+  return {
+    lang: els.lang.value,
+    showVolume: els.showVolume.value === '1',
     theme: {
-      accent: sanitizeColor($("accent").value, "#ff2bd6"),
-      accent2: sanitizeColor($("accent2").value, "#7c3aed"),
-      text: sanitizeColor($("textColor").value, "#ffffff"),
-      btn: sanitizeColor($("btnBg").value, "rgba(255,255,255,.12)"),
-      stroke: sanitizeColor($("stroke").value, "rgba(255,255,255,.16)")
+      accent: els.accent.value,
+      accent2: els.accent2.value,
+      text: els.textColor.value,
+      muted: els.mutedColor.value,
+      radius: clampInt(els.radius.value, 0, 60, 22),
     },
-    coverUrl: ($("coverUrl").value || "").trim() || DEFAULT_COVER
+    layout: {
+      height: clampInt(els.height.value, 140, 420, 220)
+    },
+    githubFolderUrl: els.githubFolder.value.trim(),
+    cover: (coverDataUrl || els.coverUrl.value.trim() || null),
   };
-  return cfg;
 }
 
-let currentTracks = [
-  { title:"Lorem ipsum", subtitle:"Demo", url:"", cover:null },
-  { title:"Dolor sit", subtitle:"Demo", url:"", cover:null },
-  { title:"Amet", subtitle:"Demo", url:"", cover:null },
-];
-
-function setStatus(msg){
-  $("status").textContent = msg || "";
+function renderPreview(){
+  const cfg = getConfig();
+  els.previewHost.innerHTML = `
+    <am-audioplayer style="width:min(720px, 100%); height:${cfg.layout.height}px;"></am-audioplayer>
+  `;
+  ensurePlayerDefined();
+  const el = els.previewHost.querySelector('am-audioplayer');
+  el.setConfig(cfg);
 }
 
-/* ===========================
-   Player (Embeddable)
-=========================== */
+function clampInt(v, min, max, fallback){
+  const n = parseInt(String(v||'').trim(), 10);
+  if (Number.isNaN(n)) return fallback;
+  return Math.max(min, Math.min(max, n));
+}
 
-function mountAudioPlayer(host, cfg, tracks){
-  host.innerHTML = "";
+function fileToDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
 
-  const dict = {
-    ru: {
-      search:"Поиск",
-      playlist:"Плейлист",
-      shuffle:"Рандом",
-      on:"вкл",
-      off:"выкл",
-      nothing:"Нет треков",
-      loading:"Загрузка...",
-      stopped:"Остановлено"
-    },
-    en: {
-      search:"Search",
-      playlist:"Playlist",
-      shuffle:"Shuffle",
-      on:"on",
-      off:"off",
-      nothing:"No tracks",
-      loading:"Loading...",
-      stopped:"Stopped"
-    }
-  };
-  const t = dict[cfg.lang] || dict.ru;
+/** --- Генерация кода для Genially --- */
+function buildGeniallyEmbedCode(cfg){
+  // Вариант 1: "прямой" код (если Genially принимает inline script)
+  // Вариант 2: iframe-srcdoc (почти всегда проходит)
+  // Мы отдаём iframe-srcdoc как самый надёжный.
+  const playerOnlyHtml = buildPlayerOnlyHtml(cfg)
+    .replaceAll(/<\/script>/g, '<\\/script>'); // защита для srcdoc
 
-  const root = document.createElement("div");
-  root.className = "ap-root";
-  root.style.setProperty("--bg", cfg.transparent ? "transparent" : "rgba(0,0,0,.18)");
-  root.style.setProperty("--accent", cfg.theme.accent);
-  root.style.setProperty("--accent2", cfg.theme.accent2);
-  root.style.setProperty("--text", cfg.theme.text);
-  root.style.setProperty("--btn", cfg.theme.btn);
-  root.style.setProperty("--stroke", cfg.theme.stroke);
-  root.style.width = cfg.width + "px";
+  const h = cfg.layout.height;
 
-  root.innerHTML = `
-    <div class="ap-shell">
-      <div class="ap-inner">
-        <div class="ap-top">
-          <div class="ap-pill">
-            <span style="opacity:.85">☰</span>
-            <span class="ap-topTitle">${tracks?.[0]?.title || "—"}</span>
-          </div>
-          <div class="ap-iconbtn" title="${t.search}" aria-label="${t.search}">⌕</div>
-        </div>
+  return `<!-- Atomicmail AudioPlayer (transparent) -->
+<iframe
+  style="width:100%; height:${h}px; border:0; background:transparent;"
+  sandbox="allow-scripts allow-same-origin allow-downloads"
+  srcdoc="${escapeHtmlAttr(playerOnlyHtml)}">
+</iframe>`;
+}
 
-        <div style="margin-top:10px; display:flex; gap:10px; justify-content:center;">
-          <div class="ap-pill" style="padding:8px 12px">${tracks?.[0]?.title?.split(" ")[0] || "Lorem"}</div>
-          <div class="ap-pill" style="padding:8px 12px">${tracks?.[0]?.title?.split(" ")[1] || "Ipsum"}</div>
-          <div class="ap-pill" style="padding:8px 12px">${tracks?.[1]?.title?.split(" ")[0] || "Dolor"}</div>
-        </div>
+function escapeHtmlAttr(s){
+  return s
+    .replaceAll('&','&amp;')
+    .replaceAll('"','&quot;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;');
+}
 
-        <div class="ap-coverWrap">
-          <div class="ap-cover">
-            <img class="ap-coverImg" alt="cover"/>
-            <div class="ap-note" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
-                <path d="M14 3v12.1c-.6-.4-1.3-.6-2-.6-2 0-3.5 1.3-3.5 3s1.5 3 3.5 3 3.5-1.3 3.5-3V8l6-1.2V3.8L14 3z"
-                      fill="rgba(255,255,255,.9)"/>
-              </svg>
-            </div>
-          </div>
-        </div>
+/** --- "Player-only" HTML (без редактора) --- */
+function buildPlayerOnlyHtml(cfg){
+  const configJson = JSON.stringify(cfg);
 
-        <div class="ap-title">
-          <div class="t1 ap-trackTitle">—</div>
-          <div class="t2 ap-trackSub">${t.stopped}</div>
-        </div>
+  return `<!doctype html>
+<html lang="${cfg.lang}">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  html,body{height:100%; margin:0; background:transparent;}
+  body{display:flex; align-items:center; justify-content:center;}
+</style>
+</head>
+<body>
+  <am-audioplayer style="width:100%; height:${cfg.layout.height}px;"></am-audioplayer>
 
-        <div class="ap-progress">
-          <div class="ap-bar" title="seek">
-            <div class="ap-fill"></div>
-          </div>
-          <div class="ap-time">
-            <span class="ap-cur">0:00</span>
-            <span class="ap-dur">0:00</span>
-          </div>
-        </div>
+  <script>
+    (${playerComponentSource()})();
+    const el = document.querySelector('am-audioplayer');
+    el.setConfig(${configJson});
+  </script>
+</body>
+</html>`;
+}
 
-        <div class="ap-controls">
-          <div class="ap-subbtn ap-prev" title="prev" aria-label="prev">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M6 6v12M18 6l-8 6 8 6V6z" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+/** --- Исходник Web Component (возвращаем как строку) --- */
+function playerComponentSource(){
+  // Важно: без внешних библиотек.
+  return function(){
+    const I18N = {
+      ru: {
+        playlist: "Плейлист",
+        loading: "Загрузка…",
+        empty: "Файлы не найдены в папке",
+        shuffle: "Случайно",
+        prev: "Назад",
+        next: "Вперёд",
+        play: "Играть",
+        pause: "Пауза",
+        volume: "Громкость",
+        error: "Не удалось загрузить список. Проверь ссылку на GitHub папку.",
+      },
+      en: {
+        playlist: "Playlist",
+        loading: "Loading…",
+        empty: "No audio files found",
+        shuffle: "Shuffle",
+        prev: "Prev",
+        next: "Next",
+        play: "Play",
+        pause: "Pause",
+        volume: "Volume",
+        error: "Failed to load list. Check the GitHub folder link.",
+      }
+    };
 
-          <button class="ap-play" title="play/pause" aria-label="play/pause">
-            <svg class="ap-playIcon" width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M8 5v14l11-7-11-7z" fill="rgba(255,255,255,.95)"/>
-            </svg>
-          </button>
+    const AUDIO_EXT = /\.(mp3|ogg|wav|m4a)$/i;
 
-          <div class="ap-subbtn ap-next" title="next" aria-label="next">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6v12M6 6l8 6-8 6V6z" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
+    class AMAudioPlayer extends HTMLElement{
+      constructor(){
+        super();
+        this.attachShadow({mode:'open'});
+        this._cfg = null;
 
-        <div class="ap-vis"><canvas class="ap-canvas"></canvas></div>
+        this.state = {
+          tracks: [],
+          idx: 0,
+          playing: false,
+          shuffle: false,
+          order: [],
+          showList: false,
+          loading: false,
+          error: "",
+        };
 
-        <div class="ap-bottom">
-          <div class="ap-toggle ap-shuffle" role="button" tabindex="0" aria-label="shuffle">
-            <span class="ap-badge"></span>
-            <span>${t.shuffle}</span>
-            <span class="ap-shTxt" style="opacity:.75">(${t.off})</span>
-          </div>
+        this.audio = new Audio();
+        this.audio.preload = "metadata";
+        this.audio.crossOrigin = "anonymous";
 
-          <div class="ap-toggle ap-plBtn" role="button" tabindex="0" aria-label="playlist">
-            <span class="ap-badge"></span>
-            <span>${t.playlist}</span>
-          </div>
-        </div>
+        this._onTime = () => this._renderProgress();
+        this._onEnded = () => this.next(true);
+      }
 
-        <div class="ap-playlist">
-          <div class="ap-pl-head">
-            <span>${t.playlist}</span>
-            <span class="ap-plCount" style="opacity:.75"></span>
-          </div>
-          <div class="ap-list"></div>
-        </div>
+      connectedCallback(){
+        this._renderShell();
+        this._wire();
+        this.audio.addEventListener('timeupdate', this._onTime);
+        this.audio.addEventListener('ended', this._onEnded);
+      }
 
-        <audio class="ap-audio" preload="metadata" crossorigin="anonymous"></audio>
+      disconnectedCallback(){
+        this.audio.removeEventListener('timeupdate', this._onTime);
+        this.audio.removeEventListener('ended', this._onEnded);
+      }
+
+      setConfig(cfg){
+        this._cfg = cfg;
+        this._applyTheme();
+        this._setCover(cfg.cover);
+        this._loadFromGithub(cfg.githubFolderUrl);
+        this._renderText();
+      }
+
+      _t(key){
+        const lang = (this._cfg?.lang || 'ru');
+        return (I18N[lang] && I18N[lang][key]) || I18N.ru[key] || key;
+      }
+
+      _applyTheme(){
+        const t = this._cfg?.theme || {};
+        const r = (t.radius ?? 22);
+        const root = this.shadowRoot.host;
+        root.style.setProperty('--ap-accent', t.accent || '#b33bff');
+        root.style.setProperty('--ap-accent2', t.accent2 || '#7a2bff');
+        root.style.setProperty('--ap-text', t.text || '#fff');
+        root.style.setProperty('--ap-muted', t.muted || '#c7c7e6');
+        root.style.setProperty('--ap-radius', r + 'px');
+      }
+
+      _renderShell(){
+        this.shadowRoot.innerHTML = `
+<style>
+  :host{
+    display:block;
+    background:transparent;
+    --ap-accent:#b33bff;
+    --ap-accent2:#7a2bff;
+    --ap-text:#fff;
+    --ap-muted:#c7c7e6;
+    --ap-radius:22px;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+
+  .wrap{
+    position:relative;
+    height:100%;
+    border-radius: var(--ap-radius);
+    overflow:hidden;
+    color: var(--ap-text);
+    box-shadow: 0 18px 55px rgba(0,0,0,.35);
+    border: 1px solid rgba(255,255,255,.14);
+    background:
+      radial-gradient(900px 500px at 10% 10%, color-mix(in oklab, var(--ap-accent) 55%, transparent), transparent 60%),
+      radial-gradient(900px 500px at 90% 90%, color-mix(in oklab, var(--ap-accent2) 50%, transparent), transparent 60%),
+      linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+    backdrop-filter: blur(10px);
+  }
+
+  .inner{
+    height:100%;
+    display:grid;
+    grid-template-columns: 190px 1fr;
+    gap: 14px;
+    padding: 14px;
+    box-sizing:border-box;
+  }
+
+  .left{
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+    justify-content:center;
+    align-items:flex-start;
+    position:relative;
+    min-width: 170px;
+  }
+
+  .cover{
+    width: 132px;
+    height: 132px;
+    border-radius: 999px;
+    overflow:hidden;
+    border: 3px solid rgba(255,255,255,.22);
+    box-shadow: 0 14px 35px rgba(0,0,0,.35);
+    background: rgba(0,0,0,.15);
+  }
+  .cover img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  .viz{
+    position:absolute;
+    left: 0;
+    bottom: 6px;
+    width: 170px;
+    height: 74px;
+    display:flex;
+    align-items:flex-end;
+    gap: 6px;
+    opacity:.85;
+    pointer-events:none;
+  }
+  .bar{
+    width: 10px;
+    border-radius: 6px;
+    background: rgba(255,255,255,.18);
+    transform-origin: bottom;
+    height: 18px;
+  }
+  .playing .bar{
+    background: rgba(255,255,255,.22);
+    animation: bounce 900ms infinite ease-in-out;
+  }
+  .bar:nth-child(2){ animation-delay: -120ms; }
+  .bar:nth-child(3){ animation-delay: -260ms; }
+  .bar:nth-child(4){ animation-delay: -340ms; }
+  .bar:nth-child(5){ animation-delay: -180ms; }
+  .bar:nth-child(6){ animation-delay: -420ms; }
+  .bar:nth-child(7){ animation-delay: -520ms; }
+  @keyframes bounce{
+    0%,100%{ transform: scaleY(.35); }
+    50%{ transform: scaleY(1.05); }
+  }
+
+  .right{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .topRow{
+    display:flex;
+    align-items:flex-start;
+    gap: 10px;
+  }
+  .meta{
+    flex:1;
+    min-width:0;
+  }
+  .title{
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .subtitle{
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--ap-muted);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .icons{
+    display:flex;
+    gap: 8px;
+    align-items:center;
+  }
+  .iconBtn{
+    width: 36px; height: 36px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.10);
+    display:grid; place-items:center;
+    cursor:pointer;
+    user-select:none;
+  }
+  .iconBtn:hover{ background: rgba(255,255,255,.14); }
+  .iconBtn.active{
+    border-color: color-mix(in oklab, var(--ap-accent) 60%, rgba(255,255,255,.18));
+    box-shadow: 0 10px 26px rgba(179,59,255,.22);
+  }
+
+  .progressRow{
+    display:grid;
+    grid-template-columns: 46px 1fr 46px;
+    gap: 10px;
+    align-items:center;
+    font-size: 12px;
+    color: var(--ap-muted);
+  }
+  .time{
+    font-variant-numeric: tabular-nums;
+  }
+  input[type="range"]{
+    width:100%;
+    accent-color: var(--ap-accent);
+  }
+
+  .controls{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    margin-top: 2px;
+  }
+
+  .circleBtn{
+    width: 44px; height: 44px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.10);
+    display:grid; place-items:center;
+    cursor:pointer;
+    user-select:none;
+  }
+  .circleBtn.big{
+    width: 54px; height: 54px;
+    background: linear-gradient(135deg, var(--ap-accent), var(--ap-accent2));
+    border: none;
+    box-shadow: 0 12px 30px rgba(179,59,255,.25);
+  }
+  .circleBtn:hover{ filter: brightness(1.05); }
+
+  .vol{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    min-width: 170px;
+  }
+  .vol span{ font-size:12px; color: var(--ap-muted); }
+  .vol input{ width: 120px; }
+
+  .listWrap{
+    position:absolute;
+    right: 14px;
+    top: 66px;
+    width: min(440px, calc(100% - 28px));
+    max-height: calc(100% - 86px);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(10,10,18,.82);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    overflow:hidden;
+    display:none;
+  }
+  .listWrap.open{ display:block; }
+
+  .listHeader{
+    padding: 10px 12px;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+  }
+  .listHeader b{ font-size:12px; letter-spacing:.3px; text-transform:uppercase; }
+  .status{ margin-left:auto; font-size:12px; color: var(--ap-muted); }
+
+  .list{
+    max-height: 320px;
+    overflow:auto;
+  }
+  .item{
+    padding: 10px 12px;
+    display:flex;
+    gap: 10px;
+    align-items:center;
+    cursor:pointer;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .item:hover{ background: rgba(255,255,255,.06); }
+  .item.active{ background: rgba(179,59,255,.14); }
+  .num{ width: 26px; color: var(--ap-muted); font-variant-numeric: tabular-nums; }
+  .name{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dur{ color: var(--ap-muted); font-size:12px; }
+
+  /* мобильная адаптация */
+  @media (max-width: 520px){
+    .inner{ grid-template-columns: 150px 1fr; }
+    .cover{ width:110px; height:110px; }
+    .vol{ display:none; }
+  }
+</style>
+
+<div class="wrap">
+  <div class="inner">
+    <div class="left">
+      <div class="cover"><img id="apCover" alt=""></div>
+      <div class="viz" id="viz">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
       </div>
     </div>
-  `;
 
-  host.appendChild(root);
-
-  const el = {
-    audio: root.querySelector(".ap-audio"),
-    title: root.querySelector(".ap-trackTitle"),
-    sub: root.querySelector(".ap-trackSub"),
-    topTitle: root.querySelector(".ap-topTitle"),
-    cover: root.querySelector(".ap-coverImg"),
-    playBtn: root.querySelector(".ap-play"),
-    playIcon: root.querySelector(".ap-playIcon"),
-    prevBtn: root.querySelector(".ap-prev"),
-    nextBtn: root.querySelector(".ap-next"),
-    bar: root.querySelector(".ap-bar"),
-    fill: root.querySelector(".ap-fill"),
-    cur: root.querySelector(".ap-cur"),
-    dur: root.querySelector(".ap-dur"),
-    shuffleBtn: root.querySelector(".ap-shuffle"),
-    shuffleTxt: root.querySelector(".ap-shTxt"),
-    plBtn: root.querySelector(".ap-plBtn"),
-    plWrap: root.querySelector(".ap-playlist"),
-    plList: root.querySelector(".ap-list"),
-    plCount: root.querySelector(".ap-plCount"),
-    canvas: root.querySelector(".ap-canvas"),
-  };
-
-  // State
-  const state = {
-    tracks: Array.isArray(tracks) ? tracks.filter(x=>x && x.url) : [],
-    index: 0,
-    isShuffle: false,
-    order: [],
-    audioCtx: null,
-    analyser: null,
-    srcNode: null,
-    raf: null,
-  };
-
-  // If no URLs in demo tracks, keep UI but disable play
-  if(!state.tracks.length){
-    el.title.textContent = t.nothing;
-    el.sub.textContent = "";
-    el.topTitle.textContent = "—";
-    el.cover.src = cfg.coverUrl || DEFAULT_COVER;
-    el.plCount.textContent = "0";
-    el.playBtn.disabled = true;
-    el.playBtn.style.opacity = .6;
-    return;
-  }
-
-  el.cover.src = cfg.coverUrl || DEFAULT_COVER;
-
-  function buildOrder(){
-    const n = state.tracks.length;
-    state.order = Array.from({length:n}, (_,i)=>i);
-    if(state.isShuffle){
-      // Fisher–Yates
-      for(let i=n-1; i>0; i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [state.order[i], state.order[j]] = [state.order[j], state.order[i]];
-      }
-      // Keep current track first
-      const cur = state.index;
-      const pos = state.order.indexOf(cur);
-      if(pos > 0){
-        state.order.splice(pos,1);
-        state.order.unshift(cur);
-      }
-    }
-  }
-
-  function currentTrack(){
-    return state.tracks[state.index];
-  }
-
-  function setTrack(i, autoplay=false){
-    state.index = (i + state.tracks.length) % state.tracks.length;
-    const tr = currentTrack();
-    el.title.textContent = tr.title || "—";
-    el.topTitle.textContent = tr.title || "—";
-    el.sub.textContent = tr.subtitle || "";
-    el.audio.src = tr.url;
-    el.audio.load();
-
-    // highlight playlist
-    [...el.plList.querySelectorAll(".ap-item")].forEach((node)=>{
-      node.classList.toggle("active", Number(node.dataset.idx) === state.index);
-    });
-
-    if(autoplay){
-      play().catch(()=>{});
-    }else{
-      setPlayIcon(false);
-    }
-  }
-
-  function setPlayIcon(isPlaying){
-    if(isPlaying){
-      el.playIcon.innerHTML = `<path d="M7 6h3v12H7zM14 6h3v12h-3z" fill="rgba(255,255,255,.95)"/>`;
-    }else{
-      el.playIcon.innerHTML = `<path d="M8 5v14l11-7-11-7z" fill="rgba(255,255,255,.95)"/>`;
-    }
-  }
-
-  async function ensureAudioGraph(){
-    if(state.audioCtx) return;
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    if(!Ctx) return;
-    state.audioCtx = new Ctx();
-    state.analyser = state.audioCtx.createAnalyser();
-    state.analyser.fftSize = 256;
-    state.analyser.smoothingTimeConstant = 0.85;
-    state.srcNode = state.audioCtx.createMediaElementSource(el.audio);
-    state.srcNode.connect(state.analyser);
-    state.analyser.connect(state.audioCtx.destination);
-  }
-
-  function draw(){
-    const cvs = el.canvas;
-    const dpr = window.devicePixelRatio || 1;
-    const w = Math.floor(cvs.clientWidth * dpr);
-    const h = Math.floor(cvs.clientHeight * dpr);
-    if(cvs.width !== w || cvs.height !== h){
-      cvs.width = w; cvs.height = h;
-    }
-    const ctx = cvs.getContext("2d");
-    ctx.clearRect(0,0,w,h);
-
-    // Background faint
-    ctx.globalAlpha = 0.25;
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(0, h-1, w, 1);
-
-    ctx.globalAlpha = 1;
-
-    if(state.analyser){
-      const buf = new Uint8Array(state.analyser.frequencyBinCount);
-      state.analyser.getByteFrequencyData(buf);
-
-      const bars = 42;
-      const step = Math.max(1, Math.floor(buf.length / bars));
-      const gap = 2 * dpr;
-      const bw = (w - gap*(bars+1)) / bars;
-
-      for(let i=0;i<bars;i++){
-        let sum = 0;
-        for(let k=0;k<step;k++) sum += buf[i*step + k] || 0;
-        const v = (sum/step) / 255; // 0..1
-        const bh = Math.max(2*dpr, v * (h-10*dpr));
-        const x = gap + i*(bw+gap);
-        const y = h - bh;
-        // simple white bars; tint comes from container gradients
-        ctx.globalAlpha = 0.8;
-        ctx.fillStyle = "rgba(255,255,255,.9)";
-        roundRect(ctx, x, y, bw, bh, 8*dpr);
-        ctx.fill();
-      }
-    }else{
-      // fallback animation-less line
-      ctx.globalAlpha = 0.4;
-      ctx.fillStyle = "rgba(255,255,255,.9)";
-      roundRect(ctx, 10*dpr, h/2, (w-20*dpr), 6*dpr, 999);
-      ctx.fill();
-    }
-
-    state.raf = requestAnimationFrame(draw);
-  }
-
-  function roundRect(ctx, x, y, w, h, r){
-    const rr = Math.min(r, w/2, h/2);
-    ctx.beginPath();
-    ctx.moveTo(x+rr, y);
-    ctx.arcTo(x+w, y, x+w, y+h, rr);
-    ctx.arcTo(x+w, y+h, x, y+h, rr);
-    ctx.arcTo(x, y+h, x, y, rr);
-    ctx.arcTo(x, y, x+w, y, rr);
-    ctx.closePath();
-  }
-
-  async function play(){
-    await ensureAudioGraph();
-    if(state.audioCtx && state.audioCtx.state === "suspended"){
-      await state.audioCtx.resume().catch(()=>{});
-    }
-    await el.audio.play();
-    setPlayIcon(true);
-    if(!state.raf) draw();
-  }
-
-  function pause(){
-    el.audio.pause();
-    setPlayIcon(false);
-  }
-
-  function togglePlay(){
-    if(el.audio.paused) play().catch(()=>{});
-    else pause();
-  }
-
-  function next(autoplay=true){
-    if(state.isShuffle){
-      const pos = state.order.indexOf(state.index);
-      const nextIdx = state.order[(pos+1) % state.order.length];
-      setTrack(nextIdx, autoplay);
-    }else{
-      setTrack(state.index + 1, autoplay);
-    }
-  }
-  function prev(autoplay=true){
-    if(state.isShuffle){
-      const pos = state.order.indexOf(state.index);
-      const prevIdx = state.order[(pos-1 + state.order.length) % state.order.length];
-      setTrack(prevIdx, autoplay);
-    }else{
-      setTrack(state.index - 1, autoplay);
-    }
-  }
-
-  function setShuffle(on){
-    state.isShuffle = !!on;
-    el.shuffleBtn.classList.toggle("on", state.isShuffle);
-    el.shuffleTxt.textContent = `(${state.isShuffle ? t.on : t.off})`;
-    buildOrder();
-  }
-
-  function buildPlaylist(){
-    el.plList.innerHTML = "";
-    el.plCount.textContent = String(state.tracks.length);
-    state.tracks.forEach((tr, idx)=>{
-      const item = document.createElement("div");
-      item.className = "ap-item" + (idx===state.index ? " active" : "");
-      item.dataset.idx = String(idx);
-      item.innerHTML = `
-        <div class="num">${idx+1}</div>
+    <div class="right">
+      <div class="topRow">
         <div class="meta">
-          <div class="name">${escapeHtml(tr.title || "—")}</div>
-          <div class="sub">${escapeHtml(tr.subtitle || "")}</div>
+          <div class="title" id="title">—</div>
+          <div class="subtitle" id="subtitle">—</div>
         </div>
-      `;
-      item.addEventListener("click", ()=>{
-        setTrack(idx, true);
-      });
-      el.plList.appendChild(item);
-    });
-  }
+        <div class="icons">
+          <div class="iconBtn" id="btnShuffle" title="Shuffle">⤮</div>
+          <div class="iconBtn" id="btnList" title="Playlist">≡</div>
+        </div>
+      </div>
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, (ch)=>({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[ch]));
-  }
+      <div class="progressRow">
+        <div class="time" id="tCur">0:00</div>
+        <input id="range" type="range" min="0" max="1000" value="0" />
+        <div class="time" id="tDur">0:00</div>
+      </div>
 
-  // Events
-  el.playBtn.addEventListener("click", togglePlay);
-  el.prevBtn.addEventListener("click", ()=>prev(true));
-  el.nextBtn.addEventListener("click", ()=>next(true));
+      <div class="controls">
+        <div class="circleBtn" id="btnPrev" title="Prev">⏮</div>
+        <div class="circleBtn big" id="btnPlay" title="Play">▶</div>
+        <div class="circleBtn" id="btnNext" title="Next">⏭</div>
 
-  el.audio.addEventListener("loadedmetadata", ()=>{
-    el.dur.textContent = formatTime(el.audio.duration);
-  });
-  el.audio.addEventListener("timeupdate", ()=>{
-    const d = el.audio.duration || 0;
-    const c = el.audio.currentTime || 0;
-    el.cur.textContent = formatTime(c);
-    const pct = d>0 ? (c/d)*100 : 0;
-    el.fill.style.width = pct.toFixed(3) + "%";
-  });
-  el.audio.addEventListener("ended", ()=>{
-    next(true);
-  });
+        <div class="vol" id="volBox">
+          <span id="volLabel">Vol</span>
+          <input id="vol" type="range" min="0" max="100" value="80" />
+        </div>
+      </div>
 
-  el.bar.addEventListener("click", (e)=>{
-    const rect = el.bar.getBoundingClientRect();
-    const x = Math.min(Math.max(0, e.clientX - rect.left), rect.width);
-    const pct = rect.width ? x / rect.width : 0;
-    const d = el.audio.duration || 0;
-    if(d>0){
-      el.audio.currentTime = pct * d;
+      <div class="hint" id="hint" style="font-size:12px;color:var(--ap-muted);"></div>
+    </div>
+  </div>
+
+  <div class="listWrap" id="listWrap">
+    <div class="listHeader">
+      <b id="listTitle">Playlist</b>
+      <div class="status" id="status"></div>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+</div>
+        `;
+      }
+
+      _wire(){
+        const $ = (id)=>this.shadowRoot.getElementById(id);
+
+        this.$title = $('title');
+        this.$subtitle = $('subtitle');
+        this.$cover = $('apCover');
+        this.$range = $('range');
+        this.$tCur = $('tCur');
+        this.$tDur = $('tDur');
+        this.$btnPlay = $('btnPlay');
+        this.$btnPrev = $('btnPrev');
+        this.$btnNext = $('btnNext');
+        this.$btnShuffle = $('btnShuffle');
+        this.$btnList = $('btnList');
+        this.$listWrap = $('listWrap');
+        this.$list = $('list');
+        this.$status = $('status');
+        this.$listTitle = $('listTitle');
+        this.$hint = $('hint');
+        this.$volBox = $('volBox');
+        this.$vol = $('vol');
+        this.$volLabel = $('volLabel');
+        this.$viz = $('viz');
+
+        this.$btnPlay.addEventListener('click', ()=> this.toggle());
+        this.$btnPrev.addEventListener('click', ()=> this.prev());
+        this.$btnNext.addEventListener('click', ()=> this.next(false));
+        this.$btnShuffle.addEventListener('click', ()=> this.toggleShuffle());
+        this.$btnList.addEventListener('click', ()=> this.toggleList());
+
+        this.$range.addEventListener('input', ()=>{
+          const dur = this.audio.duration || 0;
+          if (!dur) return;
+          const t = (parseInt(this.$range.value,10)/1000) * dur;
+          this.audio.currentTime = t;
+          this._renderProgress();
+        });
+
+        this.$vol.addEventListener('input', ()=>{
+          this.audio.volume = parseInt(this.$vol.value,10)/100;
+        });
+
+        // initial volume
+        this.audio.volume = parseInt(this.$vol.value,10)/100;
+      }
+
+      _renderText(){
+        this.$btnShuffle.title = this._t('shuffle');
+        this.$btnPrev.title = this._t('prev');
+        this.$btnNext.title = this._t('next');
+        this.$btnPlay.title = this.state.playing ? this._t('pause') : this._t('play');
+        this.$listTitle.textContent = this._t('playlist');
+        this.$btnList.title = this._t('playlist');
+        this.$volLabel.textContent = this._t('volume');
+
+        // show/hide volume
+        const showVol = !!this._cfg?.showVolume;
+        this.$volBox.style.display = showVol ? 'flex' : 'none';
+      }
+
+      _setCover(url){
+        if (!url){
+          // нейтральная заглушка
+          this.$cover.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+            `<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'>
+              <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+                <stop stop-color='#b33bff'/><stop offset='1' stop-color='#7a2bff'/>
+              </linearGradient></defs>
+              <rect width='100%' height='100%' fill='url(#g)'/>
+              <circle cx='150' cy='150' r='92' fill='rgba(255,255,255,.18)'/>
+              <text x='50%' y='54%' text-anchor='middle' font-family='Arial' font-size='44' fill='white'>♪</text>
+            </svg>`
+          );
+          return;
+        }
+        this.$cover.src = url;
+      }
+
+      async _loadFromGithub(folderUrl){
+        this.state.loading = true;
+        this.state.error = "";
+        this._renderStatus(this._t('loading'));
+        this._renderList();
+
+        try{
+          const api = this._githubFolderToApi(folderUrl);
+          if (!api) throw new Error('bad link');
+          const files = await this._fetchGithubFiles(api);
+          const tracks = files
+            .filter(f => f.type === 'file' && AUDIO_EXT.test(f.name) && f.download_url)
+            .map(f => ({
+              name: decodeURIComponent(f.name),
+              url: f.download_url
+            }));
+
+          this.state.tracks = tracks;
+          this.state.idx = 0;
+          this._rebuildOrder();
+
+          if (!tracks.length){
+            this._renderStatus(this._t('empty'));
+            this._setNowPlayingText(null);
+          }else{
+            this._renderStatus(`${tracks.length}`);
+            await this._loadTrack(0, false);
+          }
+
+          this._renderList();
+        }catch(e){
+          this.state.error = this._t('error');
+          this._renderStatus(this.state.error);
+          this._setNowPlayingText(null);
+        }finally{
+          this.state.loading = false;
+        }
+      }
+
+      _githubFolderToApi(url){
+        // Accept:
+        // https://github.com/{owner}/{repo}/tree/{branch}/{path...}
+        // also allow without /tree... -> treat as repo root
+        try{
+          const u = new URL(url);
+          if (u.hostname !== 'github.com') return null;
+          const parts = u.pathname.split('/').filter(Boolean);
+          const owner = parts[0];
+          const repo = parts[1];
+          if (!owner || !repo) return null;
+
+          let branch = 'main';
+          let path = '';
+
+          const treeIdx = parts.indexOf('tree');
+          if (treeIdx !== -1){
+            branch = parts[treeIdx+1] || 'main';
+            path = parts.slice(treeIdx+2).join('/');
+          }
+
+          // GitHub Contents API
+          const api = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
+          return api;
+        }catch{
+          return null;
+        }
+      }
+
+      async _fetchGithubFiles(apiUrl){
+        const res = await fetch(apiUrl, {
+          headers: { 'Accept':'application/vnd.github+json' }
+        });
+        if (!res.ok) throw new Error('fetch failed');
+        const data = await res.json();
+        if (Array.isArray(data)) return data;
+        // if single file returned -> make array
+        return [data];
+      }
+
+      _rebuildOrder(){
+        const n = this.state.tracks.length;
+        this.state.order = Array.from({length:n}, (_,i)=>i);
+        if (this.state.shuffle){
+          for (let i=n-1;i>0;i--){
+            const j = Math.floor(Math.random()*(i+1));
+            [this.state.order[i], this.state.order[j]] = [this.state.order[j], this.state.order[i]];
+          }
+        }
+      }
+
+      _currentIndexInOrder(){
+        const realIdx = this.state.idx;
+        const pos = this.state.order.indexOf(realIdx);
+        return pos === -1 ? 0 : pos;
+      }
+
+      _resolveNextIndex(forced){
+        const n = this.state.tracks.length;
+        if (!n) return 0;
+        const pos = this._currentIndexInOrder();
+        const nextPos = (pos + 1) % n;
+        return this.state.order[nextPos];
+      }
+
+      _resolvePrevIndex(){
+        const n = this.state.tracks.length;
+        if (!n) return 0;
+        const pos = this._currentIndexInOrder();
+        const prevPos = (pos - 1 + n) % n;
+        return this.state.order[prevPos];
+      }
+
+      async _loadTrack(idx, autoplay){
+        const t = this.state.tracks[idx];
+        if (!t) return;
+
+        this.state.idx = idx;
+        this.audio.src = t.url;
+
+        // update UI immediately
+        this._setNowPlayingText(t.name);
+
+        // wait metadata for duration display (best effort)
+        await new Promise((resolve)=>{
+          const onMeta = ()=>{
+            this.audio.removeEventListener('loadedmetadata', onMeta);
+            resolve();
+          };
+          this.audio.addEventListener('loadedmetadata', onMeta);
+          // fallback
+          setTimeout(resolve, 900);
+        });
+
+        this._renderProgress();
+        this._renderList();
+
+        if (autoplay){
+          await this.play();
+        }else{
+          // keep paused state visually
+          this._setPlaying(false);
+        }
+      }
+
+      _setNowPlayingText(name){
+        if (!name){
+          this.$title.textContent = "—";
+          this.$subtitle.textContent = "—";
+          this.$hint.textContent = "";
+          return;
+        }
+        this.$title.textContent = this._prettyTitle(name);
+        this.$subtitle.textContent = this._prettySubtitle(name);
+        this.$hint.textContent = "";
+      }
+
+      _prettyTitle(filename){
+        // Drake - In my feelings.mp3 -> "Drake"
+        const base = filename.replace(AUDIO_EXT,'');
+        const parts = base.split(' - ');
+        return parts[0] ? parts[0].trim() : base.trim();
+      }
+      _prettySubtitle(filename){
+        const base = filename.replace(AUDIO_EXT,'');
+        const parts = base.split(' - ');
+        if (parts.length >= 2) return parts.slice(1).join(' - ').trim();
+        return base.trim();
+      }
+
+      _renderStatus(text){
+        this.$status.textContent = text || "";
+      }
+
+      _renderList(){
+        const tracks = this.state.tracks || [];
+        this.$list.innerHTML = tracks.map((t,i)=>{
+          const active = i === this.state.idx ? 'active' : '';
+          return `
+            <div class="item ${active}" data-i="${i}">
+              <div class="num">${String(i+1).padStart(2,'0')}</div>
+              <div class="name">${escapeHtml(t.name)}</div>
+              <div class="dur"></div>
+            </div>
+          `;
+        }).join('');
+
+        Array.from(this.$list.querySelectorAll('.item')).forEach(el=>{
+          el.addEventListener('click', async ()=>{
+            const i = parseInt(el.getAttribute('data-i'),10);
+            await this._loadTrack(i, true);
+          });
+        });
+      }
+
+      _renderProgress(){
+        const cur = this.audio.currentTime || 0;
+        const dur = this.audio.duration || 0;
+        this.$tCur.textContent = fmtTime(cur);
+        this.$tDur.textContent = dur ? fmtTime(dur) : "0:00";
+        if (dur){
+          this.$range.value = String(Math.round((cur/dur)*1000));
+        }else{
+          this.$range.value = "0";
+        }
+      }
+
+      _setPlaying(on){
+        this.state.playing = on;
+        this.$btnPlay.textContent = on ? "⏸" : "▶";
+        this.$btnPlay.title = on ? this._t('pause') : this._t('play');
+        this.shadowRoot.querySelector('.wrap')?.classList.toggle('playing', !!on);
+      }
+
+      async play(){
+        if (!this.state.tracks.length) return;
+        try{
+          await this.audio.play();
+          this._setPlaying(true);
+        }catch(e){
+          this._setPlaying(false);
+          this.$hint.textContent = "Autoplay blocked. Click Play.";
+        }
+      }
+
+      pause(){
+        this.audio.pause();
+        this._setPlaying(false);
+      }
+
+      toggle(){
+        if (this.audio.paused) this.play();
+        else this.pause();
+      }
+
+      async next(fromEnded){
+        if (!this.state.tracks.length) return;
+        const nextIdx = this._resolveNextIndex(fromEnded);
+        await this._loadTrack(nextIdx, this.state.playing || fromEnded);
+      }
+
+      async prev(){
+        if (!this.state.tracks.length) return;
+        // если больше 3 сек — просто в начало трека
+        if ((this.audio.currentTime||0) > 3){
+          this.audio.currentTime = 0;
+          return;
+        }
+        const prevIdx = this._resolvePrevIndex();
+        await this._loadTrack(prevIdx, this.state.playing);
+      }
+
+      toggleShuffle(){
+        this.state.shuffle = !this.state.shuffle;
+        this._rebuildOrder();
+        this.$btnShuffle.classList.toggle('active', this.state.shuffle);
+      }
+
+      toggleList(){
+        this.state.showList = !this.state.showList;
+        this.$listWrap.classList.toggle('open', this.state.showList);
+      }
     }
-  });
 
-  el.shuffleBtn.addEventListener("click", ()=> setShuffle(!state.isShuffle));
-  el.plBtn.addEventListener("click", ()=>{
-    el.plWrap.classList.toggle("open");
-  });
-
-  // init
-  setShuffle(false);
-  buildPlaylist();
-  setTrack(0, false);
-}
-
-function updatePreview(){
-  const cfg = getConfigFromUI();
-  const host = $("previewHost");
-  mountAudioPlayer(host, cfg, currentTracks);
-}
-
-/* ===========================
-   Code generation for Genially
-=========================== */
-
-function buildEmbedCode(cfg, tracks){
-  // We generate a self-contained HTML snippet. User pastes into Genially HTML block.
-  // NOTE: If Genially strips <script>, fallback is to host this snippet and embed via iframe.
-  const safeCfg = JSON.stringify(cfg);
-  const safeTracks = JSON.stringify(tracks);
-
-  // Player CSS + JS are embedded (slightly trimmed but still readable).
-  // For production, you can minify later.
-  const css = document.querySelector("style").textContent; // reuse styles (includes builder too, but ok)
-  // We'll extract only player-related styles by simple heuristic:
-  const playerCss = css.split("/* --- Player (preview + embed) --- */")[1] || css;
-
-  const js = `
-  (${mountAudioPlayer.toString()});
-  (${getConfigFromUI.toString()}); // not used in embed, but harmless
-  (function(){
-    const cfg = ${safeCfg};
-    const tracks = ${safeTracks};
-    const host = document.getElementById("ap_mount");
-    mountAudioPlayer(host, cfg, tracks);
-  })();`;
-
-  return `<!-- Genially Audio Player (transparent) -->
-<div id="ap_mount"></div>
-<style>${playerCss}</style>
-<script>${js}</script>`;
-}
-
-function setCodeOutput(){
-  const cfg = getConfigFromUI();
-  const tracks = (currentTracks || []).filter(x=>x && x.url);
-  const code = buildEmbedCode(cfg, tracks);
-  $("codeOut").value = code;
-}
-
-async function copyCode(){
-  const ta = $("codeOut");
-  ta.focus();
-  ta.select();
-  try{
-    await navigator.clipboard.writeText(ta.value);
-    setStatus("✅ Код скопирован в буфер обмена.");
-  }catch(e){
-    document.execCommand("copy");
-    setStatus("✅ Код скопирован (fallback).");
-  }
-}
-
-/* ===========================
-   UI events
-=========================== */
-
-$("btnApply").addEventListener("click", ()=>{
-  updatePreview();
-  setStatus("Предпросмотр обновлён.");
-});
-
-$("btnLoad").addEventListener("click", async ()=>{
-  setStatus("Загрузка треков…");
-  const gh = $("ghFolder").value.trim();
-  const raw = $("rawLinks").value;
-
-  try{
-    let tracks = [];
-    if(gh){
-      tracks = await fetchGithubFolderAudio(gh);
+    function fmtTime(s){
+      s = Math.max(0, Math.floor(s||0));
+      const m = Math.floor(s/60);
+      const ss = String(s%60).padStart(2,'0');
+      return `${m}:${ss}`;
     }
-    const rawTracks = parseRawLinks(raw);
-    if(rawTracks.length){
-      // raw overrides/extends GitHub list (append unique)
-      const seen = new Set(tracks.map(x=>x.url));
-      rawTracks.forEach(x=>{ if(!seen.has(x.url)){ tracks.push(x); seen.add(x.url); } });
+    function escapeHtml(str){
+      return String(str||'')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#39;");
     }
 
-    if(!tracks.length){
-      throw new Error("Не удалось собрать ни одного трека. Укажи GitHub папку или raw-ссылки на mp3/wav/ogg/m4a.");
+    if (!customElements.get('am-audioplayer')){
+      customElements.define('am-audioplayer', AMAudioPlayer);
     }
+  }.toString();
+}
 
-    currentTracks = tracks;
-    updatePreview();
-    setStatus(`✅ Треки загружены: ${tracks.length}`);
-  }catch(e){
-    console.error(e);
-    setStatus("⛔ " + (e?.message || String(e)));
-  }
-});
+function ensurePlayerDefined(){
+  if (customElements.get('am-audioplayer')) return;
+  // define from same source as generator uses
+  const src = `(${playerComponentSource()})();`;
+  new Function(src)();
+}
 
-$("btnGetCode").addEventListener("click", ()=>{
-  setCodeOutput();
-  setStatus("Код сгенерирован. Вставь в Genially как HTML.");
-});
-
-$("btnCopy").addEventListener("click", copyCode);
-
-// initial preview
-updatePreview();
-setCodeOutput();
+renderPreview();
 </script>
 </body>
 </html>

@@ -1,237 +1,590 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-:root{
-  --accent:#b33bff;
-  --accent2:#7a2bff;
-  --text:#ffffff;
-  --muted:#c7c7e6;
-}
-
-body{
-  margin:0;
-  background:transparent;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-}
-
-.player{
-  width:100%;
-  max-width:720px;
-  height:220px;
-  margin:auto;
-  padding:16px;
-  box-sizing:border-box;
-  border-radius:22px;
-  backdrop-filter:blur(10px);
-  background:
-    linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
-  border:1px solid rgba(255,255,255,.18);
-  box-shadow:0 18px 50px rgba(0,0,0,.35);
-  color:var(--text);
-}
-
-.top{
-  display:flex;
-  gap:14px;
-  align-items:center;
-}
-
-.cover{
-  width:96px;
-  height:96px;
-  border-radius:50%;
-  overflow:hidden;
-  flex-shrink:0;
-  border:3px solid rgba(255,255,255,.2);
-}
-
-.cover img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.meta{
-  flex:1;
-  min-width:0;
-}
-
-.title{
-  font-size:18px;
-  font-weight:700;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.subtitle{
-  font-size:13px;
-  color:var(--muted);
-}
-
-.controls{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-top:14px;
-}
-
-.btn{
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  cursor:pointer;
-  user-select:none;
-  background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.2);
-}
-
-.btn.main{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  border:none;
-}
-
-input[type=range]{
-  width:100%;
-  accent-color:var(--accent);
-}
-
-.progress{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  font-size:12px;
-  color:var(--muted);
-}
-
-.volume{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-left:auto;
-  width:140px;
-}
-
-.playlist{
-  margin-top:12px;
-  max-height:90px;
-  overflow:auto;
-  font-size:13px;
-}
-
-.track{
-  padding:6px 8px;
-  cursor:pointer;
-  border-radius:8px;
-}
-
-.track.active{
-  background:rgba(179,59,255,.25);
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Genially Audio Player Editor</title>
+  <style>
+    :root{
+      --bg:#0b0b12;
+      --panel:#12121acc;
+      --line:#ffffff1f;
+      --txt:#f5f5ff;
+      --mut:#b9b9d3;
+      --a:#b33bff;
+      --a2:#7a2bff;
+      --r:18px;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; color:var(--txt);
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(179,59,255,.25), transparent 60%),
+        radial-gradient(900px 500px at 80% 90%, rgba(122,43,255,.18), transparent 60%),
+        var(--bg);
+    }
+    .wrap{max-width:1200px;margin:24px auto;padding:0 16px 28px;display:grid;grid-template-columns:420px 1fr;gap:16px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 18px 55px rgba(0,0,0,.35);overflow:hidden}
+    h2{margin:0;padding:14px 16px;font-size:14px;letter-spacing:.3px;text-transform:uppercase;border-bottom:1px solid var(--line);color:#eaeaff}
+    .c{padding:14px 16px}
+    label{display:block;font-size:12px;color:var(--mut);margin:0 0 6px}
+    input,select,textarea{
+      width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);
+      background:#0f0f18;color:var(--txt);outline:none
+    }
+    input[type=color]{height:40px;padding:4px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row{display:flex;gap:10px;align-items:center}.row>*{flex:1}
+    .hint{font-size:12px;color:var(--mut);line-height:1.35;margin-top:8px}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{
+      cursor:pointer;border:0;border-radius:14px;padding:10px 12px;font-weight:700;color:#fff;
+      background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 10px 28px rgba(179,59,255,.24)
+    }
+    button.secondary{background:#ffffff12;box-shadow:none;border:1px solid var(--line);color:var(--txt);font-weight:600}
+    .stage{
+      padding:16px;display:flex;justify-content:center;align-items:center;min-height:360px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px) 0 0/16px 16px,
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px) 0 0/16px 16px;
+    }
+    .codebox{display:none;margin-top:10px}
+    textarea{min-height:260px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.45}
+    @media (max-width:980px){.wrap{grid-template-columns:1fr}}
+  </style>
 </head>
-
 <body>
 
-<div class="player">
-  <div class="top">
-    <div class="cover">
-      <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=60">
-    </div>
+<div class="wrap">
+  <!-- SETTINGS -->
+  <div class="card">
+    <h2>Настройки</h2>
+    <div class="c">
+      <div class="grid">
+        <div>
+          <label>Язык</label>
+          <select id="lang">
+            <option value="ru" selected>Русский</option>
+            <option value="en">English</option>
+          </select>
+        </div>
 
-    <div class="meta">
-      <div class="title" id="title">Track 1</div>
-      <div class="subtitle">Audio Player</div>
+        <div>
+          <label>Показывать громкость</label>
+          <select id="showVol">
+            <option value="1" selected>Да</option>
+            <option value="0">Нет</option>
+          </select>
+        </div>
+
+        <div><label>Акцент</label><input id="a" type="color" value="#b33bff"></div>
+        <div><label>2-й цвет</label><input id="a2" type="color" value="#7a2bff"></div>
+
+        <div><label>Текст</label><input id="txt" type="color" value="#ffffff"></div>
+        <div><label>Вторичный</label><input id="mut" type="color" value="#c7c7e6"></div>
+
+        <div><label>Радиус (px)</label><input id="rad" value="22"></div>
+        <div><label>Высота (px)</label><input id="hgt" value="220"></div>
+      </div>
+
+      <div style="height:12px"></div>
+      <label>GitHub папка (ссылка на tree/...)</label>
+      <input id="gh" type="url" value="https://github.com/svetlana18011991/audioplayer/tree/main/audio">
+      <div class="hint">
+        Репозиторий должен быть публичным. В папке должны лежать mp3/ogg/wav/m4a.
+      </div>
+
+      <div style="height:12px"></div>
+      <div class="row">
+        <div>
+          <label>Обложка (URL)</label>
+          <input id="coverUrl" type="url" placeholder="https://.../image.jpg">
+        </div>
+        <div>
+          <label>или файл</label>
+          <input id="coverFile" type="file" accept="image/*">
+        </div>
+      </div>
+
+      <div class="btns">
+        <button id="apply">Обновить предпросмотр</button>
+        <button id="gen" class="secondary">Получить код для Genially</button>
+        <button id="copy" class="secondary" style="display:none">Копировать код</button>
+      </div>
+
+      <div class="hint">
+        Если GitHub-папка не загрузилась — в плеере будет сообщение об ошибке.
+      </div>
     </div>
   </div>
 
-  <div class="controls">
-    <div class="btn" onclick="prev()">⏮</div>
-    <div class="btn main" onclick="toggle()">▶</div>
-    <div class="btn" onclick="next()">⏭</div>
+  <!-- PREVIEW + CODE -->
+  <div class="card">
+    <h2>Предпросмотр</h2>
+    <div class="stage">
+      <div id="mount" style="width:min(820px,100%)"></div>
+    </div>
 
-    <div class="volume">
-      🔊
-      <input type="range" min="0" max="100" value="80" oninput="audio.volume=this.value/100">
+    <div class="c codebox" id="codeBox">
+      <div class="row" style="margin-bottom:8px;align-items:center">
+        <div style="font-size:12px;color:var(--mut)"><b>Код для Genially</b></div>
+        <div style="flex:1"></div>
+        <button id="close" class="secondary">Закрыть</button>
+      </div>
+      <textarea id="code" spellcheck="false"></textarea>
     </div>
   </div>
-
-  <div class="progress">
-    <span id="cur">0:00</span>
-    <input type="range" id="seek" min="0" max="1000" value="0">
-    <span id="dur">0:00</span>
-  </div>
-
-  <div class="playlist" id="list"></div>
 </div>
 
 <script>
-const tracks = [
-  {title:"Track 1", url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
-  {title:"Track 2", url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
-  {title:"Track 3", url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"}
-];
+  const $ = (id) => document.getElementById(id);
 
-let index = 0;
-const audio = new Audio(tracks[0].url);
-audio.volume = 0.8;
+  const state = { coverData:null };
 
-const titleEl = document.getElementById("title");
-const curEl = document.getElementById("cur");
-const durEl = document.getElementById("dur");
-const seek = document.getElementById("seek");
-const list = document.getElementById("list");
+  $('coverFile').addEventListener('change', async () => {
+    const f = $('coverFile').files?.[0];
+    if(!f) return;
+    state.coverData = await new Promise((res,rej)=>{
+      const r = new FileReader();
+      r.onload = ()=>res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+    $('coverUrl').value = '';
+    renderPreview();
+  });
 
-function load(i){
-  index=i;
-  audio.src = tracks[i].url;
-  titleEl.textContent = tracks[i].title;
-  renderList();
-  audio.play();
-}
+  $('apply').onclick = renderPreview;
 
-function toggle(){
-  audio.paused ? audio.play() : audio.pause();
-}
+  $('gen').onclick = () => {
+    const cfg = getCfg();
+    const html = buildPlayerHtml(cfg);
+    const b64 = toBase64(html);
 
-function next(){
-  load((index+1)%tracks.length);
-}
+    // Genially-friendly iframe: data:text/html;base64,...
+    const iframeCode =
+`<iframe
+  src="data:text/html;base64,${b64}"
+  style="width:100%;height:${cfg.height}px;border:0;background:transparent;"
+  allow="autoplay"
+></iframe>`;
 
-function prev(){
-  load((index-1+tracks.length)%tracks.length);
-}
+    $('code').value = iframeCode;
+    $('codeBox').style.display = 'block';
+    $('copy').style.display = 'inline-flex';
+    window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
+  };
 
-audio.ontimeupdate = ()=>{
-  curEl.textContent = fmt(audio.currentTime);
-  durEl.textContent = fmt(audio.duration);
-  seek.value = audio.duration ? audio.currentTime/audio.duration*1000 : 0;
-};
+  $('close').onclick = () => {
+    $('codeBox').style.display = 'none';
+    $('copy').style.display = 'none';
+  };
 
-seek.oninput = ()=>{
-  if(audio.duration) audio.currentTime = seek.value/1000*audio.duration;
-};
+  $('copy').onclick = async () => {
+    try{
+      await navigator.clipboard.writeText($('code').value);
+      $('copy').textContent = 'Скопировано ✓';
+      setTimeout(()=> $('copy').textContent='Копировать код', 1200);
+    }catch(e){
+      alert('Не удалось скопировать автоматически. Скопируй вручную из поля.');
+    }
+  };
 
-function fmt(s){
-  if(!s) return "0:00";
-  const m = Math.floor(s/60);
-  const ss = String(Math.floor(s%60)).padStart(2,"0");
-  return m+":"+ss;
-}
+  function clampInt(v,min,max,def){
+    const n = parseInt(String(v||'').trim(),10);
+    if(Number.isNaN(n)) return def;
+    return Math.max(min, Math.min(max, n));
+  }
 
-function renderList(){
-  list.innerHTML = tracks.map((t,i)=>
-    `<div class="track ${i===index?"active":""}" onclick="load(${i})">${t.title}</div>`
-  ).join("");
-}
+  function getCfg(){
+    return {
+      lang: $('lang').value,
+      showVol: $('showVol').value === '1',
+      accent: $('a').value,
+      accent2: $('a2').value,
+      text: $('txt').value,
+      muted: $('mut').value,
+      radius: clampInt($('rad').value, 0, 60, 22),
+      height: clampInt($('hgt').value, 140, 420, 220),
+      ghFolder: $('gh').value.trim(),
+      cover: (state.coverData || $('coverUrl').value.trim() || '')
+    };
+  }
 
-renderList();
+  function toBase64(str){
+    // UTF-8 safe base64
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
+  function renderPreview(){
+    const cfg = getCfg();
+    const html = buildPlayerHtml(cfg);
+
+    // Предпросмотр внутри этой страницы через iframe (самый надёжный способ)
+    $('mount').innerHTML =
+      `<iframe
+        style="width:100%;height:${cfg.height}px;border:0;background:transparent;"
+        src="data:text/html;base64,${toBase64(html)}"
+        allow="autoplay"
+      ></iframe>`;
+  }
+
+  function buildPlayerHtml(cfg){
+    const i18n = {
+      ru: { playlist:"Плейлист", shuffle:"Рандом", vol:"Громкость", error:"Не удалось загрузить папку GitHub. Проверь ссылку/публичность." },
+      en: { playlist:"Playlist", shuffle:"Shuffle", vol:"Volume", error:"Failed to load GitHub folder. Check link/public repo." }
+    }[cfg.lang] || i18n?.ru;
+
+    // Внутри этого HTML ВСЁ автономно и без внешних библиотек
+    return `<!doctype html>
+<html lang="${cfg.lang}">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{
+    --a:${cfg.accent};
+    --a2:${cfg.accent2};
+    --tx:${cfg.text};
+    --mu:${cfg.muted};
+    --rad:${cfg.radius}px;
+  }
+  html,body{height:100%;margin:0;background:transparent;}
+  body{display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+  .p{
+    width:100%;height:${cfg.height}px;box-sizing:border-box;padding:14px;border-radius:var(--rad);
+    backdrop-filter:blur(10px);
+    background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 18px 50px rgba(0,0,0,.35);
+    color:var(--tx);
+    position:relative;
+    overflow:hidden;
+  }
+  .top{display:flex;gap:14px;align-items:center;}
+  .cv{width:96px;height:96px;border-radius:50%;overflow:hidden;flex:0 0 auto;border:3px solid rgba(255,255,255,.2);background:rgba(0,0,0,.15)}
+  .cv img{width:100%;height:100%;object-fit:cover;display:block;}
+  .m{flex:1;min-width:0}
+  .t{font-size:18px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .s{font-size:13px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .icons{display:flex;gap:8px}
+  .ib{width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.10);display:grid;place-items:center;cursor:pointer;user-select:none}
+  .ib.active{box-shadow:0 10px 26px rgba(179,59,255,.22);border-color:color-mix(in oklab, var(--a) 60%, rgba(255,255,255,.18));}
+
+  .prog{display:grid;grid-template-columns:46px 1fr 46px;gap:10px;align-items:center;margin-top:10px;font-size:12px;color:var(--mu)}
+  input[type=range]{width:100%;accent-color:var(--a)}
+
+  .ctrl{display:flex;align-items:center;gap:10px;margin-top:10px}
+  .b{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;cursor:pointer;user-select:none;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2)}
+  .b.main{width:54px;height:54px;border:none;background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 12px 30px rgba(179,59,255,.25)}
+
+  .vol{margin-left:auto;display:${cfg.showVol ? 'flex' : 'none'};align-items:center;gap:8px;min-width:180px}
+  .vol span{font-size:12px;color:var(--mu)}
+  .listWrap{position:absolute;right:14px;top:64px;width:min(420px, calc(100% - 28px));max-height:calc(100% - 78px);
+    border-radius:16px;border:1px solid rgba(255,255,255,.18);
+    background:rgba(10,10,18,.82);backdrop-filter:blur(10px);box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden;display:none}
+  .listWrap.open{display:block}
+  .lh{padding:10px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.12)}
+  .lh b{font-size:12px;letter-spacing:.3px;text-transform:uppercase}
+  .st{margin-left:auto;font-size:12px;color:var(--mu)}
+  .list{max-height:300px;overflow:auto}
+  .it{padding:10px 12px;display:flex;gap:10px;align-items:center;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.08)}
+  .it:hover{background:rgba(255,255,255,.06)}
+  .it.active{background:rgba(179,59,255,.14)}
+  .num{width:26px;color:var(--mu);font-variant-numeric:tabular-nums}
+  .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .err{margin-top:10px;font-size:12px;color:var(--mu)}
+</style>
+</head>
+<body>
+  <div class="p">
+    <div class="top">
+      <div class="cv"><img id="cv" alt=""></div>
+      <div class="m">
+        <div class="t" id="tt">—</div>
+        <div class="s" id="sb">—</div>
+      </div>
+      <div class="icons">
+        <div class="ib" id="sh" title="${escapeHtml(i18n.shuffle)}">⤮</div>
+        <div class="ib" id="plBtn" title="${escapeHtml(i18n.playlist)}">≡</div>
+      </div>
+    </div>
+
+    <div class="prog">
+      <div id="tc">0:00</div>
+      <input id="rg" type="range" min="0" max="1000" value="0" />
+      <div id="td">0:00</div>
+    </div>
+
+    <div class="ctrl">
+      <div class="b" id="pv">⏮</div>
+      <div class="b main" id="pp">▶</div>
+      <div class="b" id="nx">⏭</div>
+
+      <div class="vol" id="vb">
+        <span>${escapeHtml(i18n.vol)}</span>
+        <input id="vv" type="range" min="0" max="100" value="80" />
+      </div>
+    </div>
+
+    <div class="err" id="err"></div>
+
+    <div class="listWrap" id="lw">
+      <div class="lh">
+        <b>${escapeHtml(i18n.playlist)}</b>
+        <div class="st" id="st">—</div>
+      </div>
+      <div class="list" id="li"></div>
+    </div>
+  </div>
+
+<script>
+  const GH_FOLDER = ${JSON.stringify(cfg.ghFolder)};
+  const COVER = ${JSON.stringify(cfg.cover || "")};
+  const ERR_TEXT = ${JSON.stringify(i18n.error)};
+  const EXT = /\\.(mp3|ogg|wav|m4a)$/i;
+
+  const a = new Audio();
+  a.preload = "metadata";
+  a.crossOrigin = "anonymous";
+  a.volume = 0.8;
+
+  let tracks = [];
+  let idx = 0;
+  let playing = false;
+  let shuffle = false;
+  let order = [];
+  let listOpen = false;
+
+  const $ = (id)=>document.getElementById(id);
+
+  function setCover(){
+    if(COVER){
+      $("cv").src = COVER;
+      return;
+    }
+    $("cv").src = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(
+      "<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop stop-color='${cfg.accent}'/><stop offset='1' stop-color='${cfg.accent2}'/></linearGradient></defs><rect width='100%' height='100%' fill='url(#g)'/><circle cx='150' cy='150' r='92' fill='rgba(255,255,255,.18)'/><text x='50%' y='54%' text-anchor='middle' font-family='Arial' font-size='44' fill='white'>♪</text></svg>"
+    );
+  }
+
+  function fmt(s){
+    s = Math.max(0, Math.floor(s||0));
+    const m = Math.floor(s/60);
+    const ss = String(s%60).padStart(2,"0");
+    return m+":"+ss;
+  }
+
+  function rebuildOrder(){
+    const n = tracks.length;
+    order = Array.from({length:n}, (_,i)=>i);
+    if(shuffle){
+      for(let i=n-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [order[i], order[j]] = [order[j], order[i]];
+      }
+    }
+  }
+  function posInOrder(){
+    const p = order.indexOf(idx);
+    return p === -1 ? 0 : p;
+  }
+  function nextIdx(){
+    if(!tracks.length) return 0;
+    return order[(posInOrder()+1) % tracks.length];
+  }
+  function prevIdx(){
+    if(!tracks.length) return 0;
+    return order[(posInOrder()-1+tracks.length) % tracks.length];
+  }
+
+  function renderList(){
+    $("li").innerHTML = tracks.map((t,i)=>{
+      const cls = (i===idx) ? "it active" : "it";
+      return "<div class='"+cls+"' data-i='"+i+"'><div class='num'>"+String(i+1).padStart(2,"0")+
+             "</div><div class='nm'>"+escapeHtml(t.name)+"</div></div>";
+    }).join("");
+
+    [...$("li").querySelectorAll(".it")].forEach(el=>{
+      el.onclick = ()=>loadTrack(parseInt(el.getAttribute("data-i"),10), true);
+    });
+  }
+
+  function setMeta(){
+    const t = tracks[idx];
+    if(!t){ $("tt").textContent="—"; $("sb").textContent="—"; return; }
+    const base = t.name.replace(EXT,"");
+    const parts = base.split(" - ");
+    $("tt").textContent = (parts[0] || base).trim();
+    $("sb").textContent = (parts.slice(1).join(" - ") || base).trim();
+  }
+
+  async function loadTrack(i, autoplay){
+    if(!tracks[i]) return;
+    idx = i;
+    a.src = tracks[i].url;
+    setMeta();
+    renderList();
+
+    await new Promise(res=>{
+      const on = ()=>{ a.removeEventListener("loadedmetadata", on); res(); };
+      a.addEventListener("loadedmetadata", on);
+      setTimeout(res, 800);
+    });
+
+    renderProg();
+    if(autoplay) play(); else setPlaying(false);
+  }
+
+  function renderProg(){
+    const c = a.currentTime || 0;
+    const d = a.duration || 0;
+    $("tc").textContent = fmt(c);
+    $("td").textContent = d ? fmt(d) : "0:00";
+    $("rg").value = d ? String(Math.round((c/d)*1000)) : "0";
+  }
+
+  function setPlaying(on){
+    playing = on;
+    $("pp").textContent = on ? "⏸" : "▶";
+  }
+
+  async function play(){
+    if(!tracks.length) return;
+    try{
+      await a.play();
+      setPlaying(true);
+    }catch(e){
+      setPlaying(false);
+    }
+  }
+  function pause(){ a.pause(); setPlaying(false); }
+  function toggle(){ a.paused ? play() : pause(); }
+
+  function toggleShuffle(){
+    shuffle = !shuffle;
+    rebuildOrder();
+    $("sh").classList.toggle("active", shuffle);
+  }
+
+  function toggleList(){
+    listOpen = !listOpen;
+    $("lw").classList.toggle("open", listOpen);
+  }
+
+  async function loadFromGithub(folderUrl){
+    $("err").textContent = "";
+    $("st").textContent = "…";
+    tracks = [];
+    renderList();
+
+    const api = toGithubApi(folderUrl);
+    if(!api){
+      $("err").textContent = ERR_TEXT;
+      $("st").textContent = "0";
+      return;
+    }
+
+    try{
+      const res = await fetch(api, { headers: { "Accept":"application/vnd.github+json" } });
+      if(!res.ok) throw new Error("fetch");
+      const data = await res.json();
+      const arr = Array.isArray(data) ? data : [data];
+
+      tracks = arr
+        .filter(f => f && f.type === "file" && f.download_url && EXT.test(f.name))
+        .map(f => ({ name: decodeURIComponent(f.name), url: f.download_url }));
+
+      $("st").textContent = String(tracks.length);
+
+      if(!tracks.length){
+        $("tt").textContent="—";
+        $("sb").textContent="—";
+        return;
+      }
+
+      idx = 0;
+      rebuildOrder();
+      renderList();
+      await loadTrack(0, false);
+    }catch(e){
+      $("err").textContent = ERR_TEXT;
+      $("st").textContent = "0";
+    }
+  }
+
+  function toGithubApi(url){
+    try{
+      const u = new URL(url);
+      if(u.hostname !== "github.com") return null;
+      const p = u.pathname.split("/").filter(Boolean);
+      const owner = p[0], repo = p[1];
+      if(!owner || !repo) return null;
+
+      let branch = "main";
+      let path = "";
+      const ti = p.indexOf("tree");
+      if(ti !== -1){
+        branch = p[ti+1] || "main";
+        path = p.slice(ti+2).join("/");
+      }
+      return "https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path+"?ref="+encodeURIComponent(branch);
+    }catch{
+      return null;
+    }
+  }
+
+  // UI events
+  $("pp").onclick = toggle;
+  $("nx").onclick = ()=>loadTrack(nextIdx(), playing);
+  $("pv").onclick = ()=>{
+    if((a.currentTime||0) > 3){ a.currentTime = 0; return; }
+    loadTrack(prevIdx(), playing);
+  };
+  $("sh").onclick = toggleShuffle;
+  $("plBtn").onclick = toggleList;
+
+  $("rg").oninput = ()=>{
+    const d = a.duration || 0;
+    if(!d) return;
+    a.currentTime = (parseInt($("rg").value,10)/1000) * d;
+    renderProg();
+  };
+
+  $("vv").oninput = ()=>{ a.volume = parseInt($("vv").value,10)/100; };
+  a.ontimeupdate = renderProg;
+  a.onended = ()=>loadTrack(nextIdx(), true);
+
+  // init
+  setCover();
+  loadFromGithub(GH_FOLDER);
+
+  function escapeHtml(str){
+    return String(str||"")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+</script>
+</body>
+</html>`;
+  }
+
+  function escapeHtml(s){
+    return String(s||"")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+
+  // стартуем сразу
+  renderPreview();
 </script>
 
 </body>

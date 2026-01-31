@@ -3,32 +3,30 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Audio Player + Editor</title>
+  <title>Audio Player + Editor (Genially)</title>
   <style>
     :root{
       --bg: #0b0b0f;
       --panel: rgba(255,255,255,.06);
-      --panel2: rgba(255,255,255,.08);
       --border: rgba(255,255,255,.12);
       --text: #e9e9ef;
       --muted: rgba(233,233,239,.7);
 
-      /* стиль плеера */
       --accent: #a855f7;
       --accent2:#3b82f6;
 
       --radius: 16px;
     }
-    html,body{height:100%; margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--text); background:
-      radial-gradient(1200px 600px at 0% 100%, rgba(168,85,247,.25), transparent 60%),
-      radial-gradient(1200px 600px at 100% 0%, rgba(59,130,246,.18), transparent 60%),
-      var(--bg);
+    html,body{
+      height:100%; margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 0% 100%, rgba(168,85,247,.25), transparent 60%),
+        radial-gradient(1200px 600px at 100% 0%, rgba(59,130,246,.18), transparent 60%),
+        var(--bg);
     }
-
-    /* режим "только плеер" (для Genially) */
-    body.playerOnly{
-      background: rgba(0,0,0,0);
-    }
+    body.playerOnly{ background: rgba(0,0,0,0); }
 
     .app{
       height:100%;
@@ -38,12 +36,8 @@
       padding: 18px;
       box-sizing:border-box;
     }
-    body.playerOnly .app{
-      display:block;
-      padding: 0;
-    }
+    body.playerOnly .app{ display:none; }
 
-    /* редактор */
     .left{
       background: var(--panel);
       border: 1px solid var(--border);
@@ -53,13 +47,10 @@
       box-shadow: 0 18px 60px rgba(0,0,0,.35);
       overflow:auto;
     }
-    body.playerOnly .left{ display:none; }
-
     h1{font-size:18px; margin:0 0 10px;}
     .desc{font-size:12px; color:var(--muted); margin-bottom: 14px; line-height:1.35;}
     .group{margin: 14px 0;}
     label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px;}
-
     input[type="text"], input[type="url"], select, textarea{
       width:100%;
       box-sizing:border-box;
@@ -70,10 +61,8 @@
       padding: 10px 10px;
       outline: none;
     }
-
     .row{display:flex; gap:10px; align-items:center;}
     .row > *{flex:1;}
-
     .btn{
       width:100%;
       border:0;
@@ -92,7 +81,6 @@
       color: var(--text);
       font-weight: 650;
     }
-
     .codeBox{ display:none; margin-top: 10px; }
     textarea{
       min-height: 120px;
@@ -103,7 +91,6 @@
     }
     .hint{font-size:12px; color:var(--muted); margin-top: 8px; line-height:1.35;}
 
-    /* предпросмотр */
     .right{
       position:relative;
       border-radius: var(--radius);
@@ -113,12 +100,6 @@
       overflow:hidden;
       min-height: 520px;
     }
-    body.playerOnly .right{
-      border:0;
-      background: transparent;
-      min-height: 0;
-    }
-
     .previewTitle{
       position:absolute;
       top: 10px; left: 12px;
@@ -127,40 +108,17 @@
       letter-spacing:.2px;
       z-index: 2;
     }
-    body.playerOnly .previewTitle{ display:none; }
+    iframe{ width:100%; height:100%; border:0; background: transparent; }
 
-    iframe{
-      width:100%;
-      height:100%;
-      border:0;
-      background: transparent;
-    }
-
-    details{
-      margin-top: 10px;
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 12px;
-      padding: 10px;
-      background: rgba(255,255,255,.04);
-    }
-    summary{
-      cursor:pointer;
-      color: rgba(255,255,255,.85);
-      font-size: 12px;
-      font-weight: 650;
-    }
-
-    /* ====== СТИЛИ ПЛЕЕРА (встроенный режим) ====== */
+    /* ===== PLAYER UI ===== */
     .wrap{
-      height:100%;
+      min-height: 100vh;
       display:flex;
       align-items:center;
       justify-content:center;
       padding: 12px;
       box-sizing:border-box;
     }
-    body.playerOnly .wrap{ min-height: 100vh; }
-
     .player{
       width: min(760px, 100%);
       background:
@@ -173,8 +131,7 @@
       overflow:hidden;
       position: relative;
       backdrop-filter: blur(10px);
-      color: #fff;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:#fff;
     }
     .top{display:flex; gap: 14px; padding: 16px 16px 10px; align-items:center;}
     .cover{
@@ -200,20 +157,9 @@
     .mid{padding: 0 16px 10px;}
     .timelineRow{display:flex; align-items:center; gap:10px; font-size:12px; color: rgba(255,255,255,.7);}
     .time{width:46px; text-align:center; font-variant-numeric: tabular-nums;}
-    .bar{
-      flex:1 1 auto; height:10px; border-radius:999px; background: rgba(255,255,255,.14);
-      position:relative; cursor:pointer; overflow:hidden;
-    }
-    .barFill{
-      position:absolute; inset:0; width:0%;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      border-radius:999px;
-    }
-    .barKnob{
-      position:absolute; top:50%; transform: translate(-50%,-50%); left:0%;
-      width:14px; height:14px; border-radius:999px; background: rgba(255,255,255,.92);
-      box-shadow: 0 10px 18px rgba(0,0,0,.25); pointer-events:none;
-    }
+    .bar{flex:1 1 auto; height:10px; border-radius:999px; background: rgba(255,255,255,.14); position:relative; cursor:pointer; overflow:hidden;}
+    .barFill{position:absolute; inset:0; width:0%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius:999px;}
+    .barKnob{position:absolute; top:50%; transform: translate(-50%,-50%); left:0%; width:14px; height:14px; border-radius:999px; background: rgba(255,255,255,.92); box-shadow: 0 10px 18px rgba(0,0,0,.25); pointer-events:none;}
 
     .controls{display:flex; align-items:center; justify-content:center; gap:10px; padding: 2px 16px 10px;}
     .btnP{
@@ -222,11 +168,7 @@
       color:#fff; cursor:pointer; display:grid; place-items:center; transition:.15s ease;
     }
     .btnP:hover{ background: rgba(255,255,255,.22); }
-    .btnP.big{
-      width:58px; height:58px;
-      background: rgba(255,255,255,.18);
-      border: 1px solid rgba(255,255,255,.16);
-    }
+    .btnP.big{ width:58px; height:58px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.16); }
     svg{ width:22px; height:22px; }
 
     .bottom{display:flex; align-items:center; gap:12px; padding: 0 16px 14px;}
@@ -245,31 +187,28 @@
       overflow:hidden; display:none; backdrop-filter: blur(10px); z-index:5;
     }
     .playlist.open{ display:block; }
-    .plistHead{
-      padding:10px 12px; font-size:12px; color: rgba(255,255,255,.7);
-      display:flex; align-items:center; justify-content:space-between;
-      border-bottom: 1px solid rgba(255,255,255,.10);
-    }
+    .plistHead{ padding:10px 12px; font-size:12px; color: rgba(255,255,255,.7); display:flex; align-items:center; justify-content:space-between; border-bottom: 1px solid rgba(255,255,255,.10);}
     .plistItems{ max-height:300px; overflow:auto; }
     .track{ padding:10px 12px; cursor:pointer; display:flex; gap:10px; align-items:center; border-bottom: 1px solid rgba(255,255,255,.06); }
     .track:hover{ background: rgba(255,255,255,.06); }
     .track.active{ background: rgba(168,85,247,.18); }
     .tname{ flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:13px;}
     .badge{ font-size:11px; color: rgba(255,255,255,.85); background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.10); padding:2px 8px; border-radius:999px; }
-
     .hintP{ padding: 8px 16px 16px; color: rgba(255,255,255,.75); font-size:12px; display:none; line-height:1.35; }
     .hintP.show{ display:block; }
   </style>
 </head>
 <body>
-  <div class="app">
 
-    <!-- РЕДАКТОР -->
-    <div class="left" id="editor">
+  <!-- EDITOR -->
+  <div class="app">
+    <div class="left">
       <h1>Редактор плеера</h1>
       <div class="desc">
-        Настрой язык и обложку, нажми <b>Получить ссылку</b> и вставь её в Genially (лучше через iframe).
-        Для Genially открывай ссылку в режиме <b>mode=player</b> — там будет только плеер без редактора.
+        Настрой язык и обложку. Потом вставь iframe в Genially.
+        <br><br>
+        ⚠️ В Genially без “элемента на всех страницах” музыка физически не может играть бесшовно.
+        Но этот плеер <b>восстанавливает трек/позицию</b> при каждом перелистывании.
       </div>
 
       <div class="group">
@@ -283,7 +222,7 @@
       <div class="group">
         <label>Ссылка на обложку (URL)</label>
         <input id="cover" type="url" placeholder="https://.../cover.jpg">
-        <div class="hint">Можно оставить пустым — будет дефолтная круглая обложка.</div>
+        <div class="hint">Пусто → дефолтная обложка.</div>
       </div>
 
       <div class="group row">
@@ -292,15 +231,15 @@
       </div>
 
       <div class="codeBox" id="codeBox">
-        <label>Ссылка (для Genially лучше использовать iframe ниже)</label>
+        <label>Ссылка на плеер</label>
         <input id="playerLink" type="text" readonly>
 
         <div class="group">
-          <label>iframe-код для Genially</label>
+          <label>iframe для Genially</label>
           <textarea id="codeArea" readonly></textarea>
           <div class="hint">
-            В Genially вставляй как Embed/HTML. Если есть настройка прозрачности — включи её.
-            Ширину/высоту можно поменять.
+            Вставляй один и тот же iframe на все страницы (один URL).
+            Иначе восстановление не совпадёт.
           </div>
         </div>
 
@@ -309,35 +248,15 @@
           <button class="btn secondary" id="btnOpen">Открыть плеер</button>
         </div>
       </div>
-
-      <!-- (опционально) скрытые “важные” настройки источника треков -->
-      <details>
-        <summary>Дополнительно (репозиторий/ветка)</summary>
-        <div class="group">
-          <label>owner</label>
-          <input id="owner" type="text" value="svetlana18011991">
-        </div>
-        <div class="group">
-          <label>repo</label>
-          <input id="repo" type="text" value="audioplayer">
-        </div>
-        <div class="group">
-          <label>branch</label>
-          <input id="branch" type="text" value="main">
-        </div>
-        <div class="hint">Треки берутся из корня (как у тебя сейчас).</div>
-      </details>
     </div>
 
-    <!-- ПРЕДПРОСМОТР -->
     <div class="right">
       <div class="previewTitle">Предпросмотр</div>
       <iframe id="frame" allow="autoplay"></iframe>
     </div>
-
   </div>
 
-  <!-- ВСТРОЕННЫЙ ПЛЕЕР (когда mode=player) -->
+  <!-- PLAYER -->
   <div id="playerRoot" style="display:none">
     <div class="wrap">
       <div class="player">
@@ -445,20 +364,16 @@
   const qs = new URLSearchParams(location.search);
   const mode = (qs.get("mode") || "editor").toLowerCase();
 
-  // ======== общие дефолты ========
   const DEFAULTS = {
     owner: "svetlana18011991",
     repo: "audioplayer",
     branch: "main",
-    // треки в корне репо => path пустой
-    path: "",
+    path: "",            // треки в корне
     lang: "ru",
     cover: "",
     volume: 0.8,
-    autoplay: false,
     accent: "#a855f7",
     accent2: "#3b82f6",
-    text: "#ffffff",
   };
 
   const cfg = {
@@ -469,99 +384,61 @@
     lang: (qs.get("lang") || DEFAULTS.lang).toLowerCase(),
     cover: qs.get("cover") || DEFAULTS.cover,
     volume: clamp01(parseFloat(qs.get("volume") || DEFAULTS.volume)),
-    autoplay: (qs.get("autoplay")==="1") || DEFAULTS.autoplay,
     accent: qs.get("accent") || DEFAULTS.accent,
     accent2: qs.get("accent2") || DEFAULTS.accent2,
-    text: qs.get("text") || DEFAULTS.text,
   };
 
-  // ======== режим Player (для Genially) ========
+  // ключ состояния (ВАЖНО: не меняй между страницами)
+  const STORE_KEY = `genially_ap_state_v1:${cfg.owner}/${cfg.repo}/${cfg.branch}/${cfg.path}`;
+
   if(mode === "player"){
     document.body.classList.add("playerOnly");
-    document.querySelector(".app").style.display = "none";
     document.getElementById("playerRoot").style.display = "block";
-
     document.documentElement.style.setProperty("--accent", cfg.accent);
     document.documentElement.style.setProperty("--accent2", cfg.accent2);
-
-    runPlayer({
-      ...cfg,
-      // маппинг DOM id для плеера
-      ids: {
-        audio:"p_audio", coverImg:"p_coverImg", trackTitle:"p_trackTitle", trackSub:"p_trackSub",
-        curTime:"p_curTime", durTime:"p_durTime", seekBar:"p_seekBar", barFill:"p_barFill", barKnob:"p_barKnob",
-        btnPlay:"p_btnPlay", icoPlay:"p_icoPlay", btnPrev:"p_btnPrev", btnNext:"p_btnNext",
-        btnShuffle:"p_btnShuffle", btnPlaylist:"p_btnPlaylist", btnLike:"p_btnLike",
-        playlist:"p_playlist", plistTitle:"p_plistTitle", plistCount:"p_plistCount", plistItems:"p_plistItems",
-        volLabel:"p_volLabel", volRange:"p_volRange",
-        canvas:"p_canvas", hint:"p_hint",
-      }
-    });
+    runPlayer(cfg);
     return;
   }
 
-  // ======== режим Editor ========
-  const els = {
-    lang: q("#lang"),
-    cover: q("#cover"),
-    owner: q("#owner"),
-    repo: q("#repo"),
-    branch: q("#branch"),
-    btnPreview: q("#btnPreview"),
-    btnCode: q("#btnCode"),
-    codeBox: q("#codeBox"),
-    codeArea: q("#codeArea"),
-    playerLink: q("#playerLink"),
-    btnCopy: q("#btnCopy"),
-    btnOpen: q("#btnOpen"),
-    frame: q("#frame"),
-  };
+  // ===== EDITOR =====
+  const langEl = document.getElementById("lang");
+  const coverEl = document.getElementById("cover");
+  const btnPreview = document.getElementById("btnPreview");
+  const btnCode = document.getElementById("btnCode");
+  const codeBox = document.getElementById("codeBox");
+  const playerLink = document.getElementById("playerLink");
+  const codeArea = document.getElementById("codeArea");
+  const btnCopy = document.getElementById("btnCopy");
+  const btnOpen = document.getElementById("btnOpen");
+  const frame = document.getElementById("frame");
 
-  // подставим текущие настройки
-  els.lang.value = cfg.lang;
-  els.cover.value = cfg.cover;
-  els.owner.value = cfg.owner;
-  els.repo.value = cfg.repo;
-  els.branch.value = cfg.branch;
+  langEl.value = cfg.lang;
+  coverEl.value = cfg.cover;
 
   function buildPlayerUrl(){
-    // index.html?mode=player...
-    const base = location.href.split("?")[0]; // текущий index.html без query
+    const base = location.href.split("?")[0];
     const p = new URLSearchParams();
     p.set("mode","player");
-    p.set("lang", els.lang.value);
-    if(els.cover.value.trim()) p.set("cover", els.cover.value.trim());
-
-    // “важные” параметры источника
-    p.set("owner", els.owner.value.trim() || DEFAULTS.owner);
-    p.set("repo", els.repo.value.trim() || DEFAULTS.repo);
-    p.set("branch", els.branch.value.trim() || DEFAULTS.branch);
-
-    // треки в корне => path пустой, можно не задавать
-    // p.set("path","");
-
-    // стиль
-    p.set("accent", DEFAULTS.accent);
-    p.set("accent2", DEFAULTS.accent2);
-    p.set("text", DEFAULTS.text);
-
-    // громкость можно оставить дефолтом
-    p.set("volume", String(DEFAULTS.volume));
-
+    p.set("lang", langEl.value);
+    if(coverEl.value.trim()) p.set("cover", coverEl.value.trim());
+    p.set("owner", cfg.owner);
+    p.set("repo", cfg.repo);
+    p.set("branch", cfg.branch);
+    p.set("accent", cfg.accent);
+    p.set("accent2", cfg.accent2);
+    p.set("volume", String(cfg.volume));
     return base + "?" + p.toString();
   }
 
-  function updatePreview(){
-    els.frame.src = buildPlayerUrl();
-  }
+  function updatePreview(){ frame.src = buildPlayerUrl(); }
 
-  els.btnPreview.addEventListener("click", updatePreview);
+  btnPreview.addEventListener("click", updatePreview);
 
-  els.btnCode.addEventListener("click", () => {
+  btnCode.addEventListener("click", () => {
     const url = buildPlayerUrl();
-    els.playerLink.value = url;
+    playerLink.value = url;
 
-    const code =
+    const iframeCode =
 `<iframe
   src="${url}"
   width="760"
@@ -570,114 +447,181 @@
   allow="autoplay"
   loading="lazy"
 ></iframe>`;
-    els.codeArea.value = code;
-    els.codeBox.style.display = "block";
+    codeArea.value = iframeCode;
+    codeBox.style.display = "block";
   });
 
-  els.btnCopy.addEventListener("click", async () => {
+  btnCopy.addEventListener("click", async () => {
     try{
-      await navigator.clipboard.writeText(els.codeArea.value);
-      els.btnCopy.textContent = "Скопировано!";
-      setTimeout(()=>els.btnCopy.textContent="Скопировать", 900);
-    }catch(e){
-      els.btnCopy.textContent = "Не удалось";
-      setTimeout(()=>els.btnCopy.textContent="Скопировать", 900);
+      await navigator.clipboard.writeText(codeArea.value);
+      btnCopy.textContent = "Скопировано!";
+      setTimeout(()=>btnCopy.textContent="Скопировать", 900);
+    }catch{
+      btnCopy.textContent = "Не удалось";
+      setTimeout(()=>btnCopy.textContent="Скопировать", 900);
     }
   });
 
-  els.btnOpen.addEventListener("click", () => {
-    window.open(buildPlayerUrl(), "_blank");
-  });
+  btnOpen.addEventListener("click", () => window.open(buildPlayerUrl(), "_blank"));
 
-  // стартовый предпросмотр
   updatePreview();
 
-  function q(sel){ return document.querySelector(sel); }
-
-  // ======== ПЛЕЕР (логика) ========
+  // ===== PLAYER =====
   function runPlayer(config){
-    const ids = config.ids;
     const i18n = {
-      ru: { loading:"Загрузка…", playlist:"Плейлист", vol:"Громкость", noTracks:"Не нашёл аудиофайлы в корне репозитория. Проверь public и форматы mp3/wav/ogg/m4a/aac/flac.", apiLimit:"GitHub API ограничил запросы. Подождите и попробуйте снова."},
-      en: { loading:"Loading…", playlist:"Playlist", vol:"Volume", noTracks:"No audio files found in repo root. Check repo is public and audio formats.", apiLimit:"GitHub API rate limit hit. Wait and try again."}
+      ru: {
+        loading:"Загрузка…",
+        playlist:"Плейлист",
+        vol:"Громкость",
+        noTracks:"Не нашёл аудиофайлы в корне репозитория. Проверь public и форматы mp3/wav/ogg/m4a/aac/flac.",
+        apiLimit:"GitHub API ограничил запросы. Подождите и попробуйте снова."
+      },
+      en: {
+        loading:"Loading…",
+        playlist:"Playlist",
+        vol:"Volume",
+        noTracks:"No audio files found in repo root. Check repo is public and audio formats.",
+        apiLimit:"GitHub API rate limit hit. Wait and try again."
+      }
     };
     const t = i18n[config.lang] || i18n.ru;
 
-    const audio = document.getElementById(ids.audio);
-    const coverImg = document.getElementById(ids.coverImg);
-    const trackTitle = document.getElementById(ids.trackTitle);
-    const trackSub = document.getElementById(ids.trackSub);
-    const curTime = document.getElementById(ids.curTime);
-    const durTime = document.getElementById(ids.durTime);
-    const seekBar = document.getElementById(ids.seekBar);
-    const barFill = document.getElementById(ids.barFill);
-    const barKnob = document.getElementById(ids.barKnob);
+    const audio = document.getElementById("p_audio");
+    const coverImg = document.getElementById("p_coverImg");
+    const trackTitle = document.getElementById("p_trackTitle");
+    const trackSub = document.getElementById("p_trackSub");
+    const curTime = document.getElementById("p_curTime");
+    const durTime = document.getElementById("p_durTime");
+    const seekBar = document.getElementById("p_seekBar");
+    const barFill = document.getElementById("p_barFill");
+    const barKnob = document.getElementById("p_barKnob");
 
-    const btnPlay = document.getElementById(ids.btnPlay);
-    const icoPlay = document.getElementById(ids.icoPlay);
-    const btnPrev = document.getElementById(ids.btnPrev);
-    const btnNext = document.getElementById(ids.btnNext);
-    const btnShuffle = document.getElementById(ids.btnShuffle);
-    const btnPlaylist = document.getElementById(ids.btnPlaylist);
-    const btnLike = document.getElementById(ids.btnLike);
+    const btnPlay = document.getElementById("p_btnPlay");
+    const icoPlay = document.getElementById("p_icoPlay");
+    const btnPrev = document.getElementById("p_btnPrev");
+    const btnNext = document.getElementById("p_btnNext");
+    const btnShuffle = document.getElementById("p_btnShuffle");
+    const btnPlaylist = document.getElementById("p_btnPlaylist");
+    const btnLike = document.getElementById("p_btnLike");
 
-    const playlistEl = document.getElementById(ids.playlist);
-    const plistTitle = document.getElementById(ids.plistTitle);
-    const plistCount = document.getElementById(ids.plistCount);
-    const plistItems = document.getElementById(ids.plistItems);
+    const playlistEl = document.getElementById("p_playlist");
+    const plistTitle = document.getElementById("p_plistTitle");
+    const plistCount = document.getElementById("p_plistCount");
+    const plistItems = document.getElementById("p_plistItems");
 
-    const volLabel = document.getElementById(ids.volLabel);
-    const volRange = document.getElementById(ids.volRange);
-    const hint = document.getElementById(ids.hint);
+    const volLabel = document.getElementById("p_volLabel");
+    const volRange = document.getElementById("p_volRange");
+    const hint = document.getElementById("p_hint");
 
     trackTitle.textContent = t.loading;
     plistTitle.textContent = t.playlist;
     volLabel.textContent = t.vol;
     trackSub.textContent = `${config.owner}/${config.repo}${config.path?"/"+config.path:""}`;
-
     coverImg.src = config.cover || svgPlaceholder(config.accent, config.accent2);
 
-    audio.volume = config.volume;
-    volRange.value = String(config.volume);
-    volRange.addEventListener("input", () => audio.volume = clamp01(parseFloat(volRange.value)));
-
-    let tracks = [];
-    let idx = 0;
-    let shuffle = false;
-    let order = [];
-
-    async function loadTracks(){
-      const base = `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/contents`;
-      const api = config.path
-        ? `${base}/${encodeURIComponent(config.path)}?ref=${encodeURIComponent(config.branch)}`
-        : `${base}?ref=${encodeURIComponent(config.branch)}`;
-
-      try{
-        const res = await fetch(api, {headers: {"Accept":"application/vnd.github+json"}});
-        if(res.status === 403){ showHint(t.apiLimit, true); return; }
-        if(!res.ok){ showHint(t.noTracks, true); return; }
-
-        const data = await res.json();
-        const items = Array.isArray(data) ? data : [data];
-
-        const exts = [".mp3",".wav",".ogg",".m4a",".aac",".flac"];
-        tracks = items
-          .filter(x => x && x.type === "file" && typeof x.name === "string")
-          .filter(x => exts.some(e => x.name.toLowerCase().endsWith(e)))
-          .map(x => ({ name: x.name, url: x.download_url }));
-
-        plistCount.textContent = String(tracks.length);
-        if(!tracks.length){ showHint(t.noTracks, true); return; }
-
-        renderPlaylist();
-        loadIndex(0);
-
-        if(config.autoplay) audio.play().catch(()=>{});
-      }catch(e){
-        showHint(t.noTracks, true);
-      }
+    // ---------- State helpers ----------
+    function loadState(){
+      try{ return JSON.parse(localStorage.getItem(STORE_KEY)); }
+      catch{ return null; }
+    }
+    function saveState(extra = {}){
+      const state = {
+        trackIndex: currentIndex,
+        time: audio.currentTime || 0,
+        volume: audio.volume,
+        isPlaying: !audio.paused,
+        shuffle: isShuffle,
+        order: shuffleOrder,
+        ts: Date.now(),
+        ...extra
+      };
+      localStorage.setItem(STORE_KEY, JSON.stringify(state));
     }
 
+    const saved = loadState();
+
+    // playlist state
+    let tracks = [];
+    let currentIndex = saved?.trackIndex ?? 0;
+
+    let isShuffle = !!(saved?.shuffle ?? false);
+    let shuffleOrder = Array.isArray(saved?.order) ? saved.order : [];
+
+    audio.volume = clamp01(saved?.volume ?? config.volume);
+    volRange.value = String(audio.volume);
+
+    volRange.addEventListener("input", () => {
+      audio.volume = clamp01(parseFloat(volRange.value));
+      saveState();
+    });
+
+    // ---------- Controls ----------
+    btnPlay.addEventListener("click", () => {
+      if(audio.paused) audio.play().catch(()=>{});
+      else audio.pause();
+    });
+
+    btnPrev.addEventListener("click", prev);
+    btnNext.addEventListener("click", next);
+
+    btnShuffle.addEventListener("click", () => {
+      isShuffle = !isShuffle;
+      btnShuffle.classList.toggle("active", isShuffle);
+
+      if(isShuffle){
+        shuffleOrder = [...Array(tracks.length).keys()];
+        for(let i=shuffleOrder.length-1;i>0;i--){
+          const j = Math.floor(Math.random()*(i+1));
+          [shuffleOrder[i], shuffleOrder[j]] = [shuffleOrder[j], shuffleOrder[i]];
+        }
+      }else{
+        shuffleOrder = [];
+      }
+      saveState();
+    });
+
+    btnPlaylist.addEventListener("click", () => playlistEl.classList.toggle("open"));
+    btnLike.addEventListener("click", () => btnLike.classList.toggle("active"));
+
+    document.addEventListener("click", (e) => {
+      const inside = playlistEl.contains(e.target) || btnPlaylist.contains(e.target);
+      if(!inside) playlistEl.classList.remove("open");
+    });
+
+    audio.addEventListener("play", () => {
+      icoPlay.innerHTML = `<path d="M6 5h4v14H6zM14 5h4v14h-4z"></path>`;
+      saveState({ isPlaying:true });
+    });
+
+    audio.addEventListener("pause", () => {
+      icoPlay.innerHTML = `<path d="M8 5v14l11-7z"></path>`;
+      saveState({ isPlaying:false });
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      updateProgress();
+      // сохраняем примерно раз в 2 секунды
+      if(Math.floor(audio.currentTime) % 2 === 0) saveState();
+    });
+
+    audio.addEventListener("loadedmetadata", updateProgress);
+    audio.addEventListener("ended", () => next());
+
+    // seek
+    let seeking = false;
+    seekBar.addEventListener("pointerdown", (e) => { seeking = true; seekToEvent(e); seekBar.setPointerCapture(e.pointerId); });
+    seekBar.addEventListener("pointermove", (e) => { if(seeking) seekToEvent(e); });
+    seekBar.addEventListener("pointerup", () => { seeking = false; saveState(); });
+
+    function seekToEvent(e){
+      if(!audio.duration || !isFinite(audio.duration)) return;
+      const rect = seekBar.getBoundingClientRect();
+      const x = Math.min(Math.max(0, e.clientX - rect.left), rect.width);
+      audio.currentTime = (x / rect.width) * audio.duration;
+      updateProgress();
+    }
+
+    // ---------- Playlist render ----------
     function renderPlaylist(){
       plistItems.innerHTML = "";
       tracks.forEach((tr, i) => {
@@ -695,6 +639,7 @@
 
         row.appendChild(name);
         row.appendChild(badge);
+
         row.addEventListener("click", () => {
           loadIndex(i);
           audio.play().catch(()=>{});
@@ -707,91 +652,41 @@
 
     function markActive(){
       [...plistItems.querySelectorAll(".track")].forEach(el => {
-        el.classList.toggle("active", parseInt(el.dataset.i,10) === idx);
+        el.classList.toggle("active", parseInt(el.dataset.i,10) === currentIndex);
       });
     }
 
     function loadIndex(i){
-      idx = clampInt(i, 0, tracks.length-1);
-      const tr = tracks[idx];
+      currentIndex = clampInt(i, 0, tracks.length-1);
+      const tr = tracks[currentIndex];
       audio.src = tr.url;
       trackTitle.textContent = prettifyName(tr.name);
       trackSub.textContent = `${config.owner}/${config.repo}${config.path?"/"+config.path:""}`;
       markActive();
       updateProgress();
-    }
-
-    btnPlay.addEventListener("click", () => {
-      if(audio.paused) audio.play().catch(()=>{});
-      else audio.pause();
-    });
-
-    btnPrev.addEventListener("click", prev);
-    btnNext.addEventListener("click", next);
-
-    btnShuffle.addEventListener("click", () => {
-      shuffle = !shuffle;
-      btnShuffle.classList.toggle("active", shuffle);
-      if(shuffle){
-        order = [...Array(tracks.length).keys()];
-        for(let i=order.length-1;i>0;i--){
-          const j = Math.floor(Math.random()*(i+1));
-          [order[i], order[j]] = [order[j], order[i]];
-        }
-      }else{
-        order = [];
-      }
-    });
-
-    btnPlaylist.addEventListener("click", () => playlistEl.classList.toggle("open"));
-    btnLike.addEventListener("click", () => btnLike.classList.toggle("active"));
-
-    document.addEventListener("click", (e) => {
-      const inside = playlistEl.contains(e.target) || btnPlaylist.contains(e.target);
-      if(!inside) playlistEl.classList.remove("open");
-    });
-
-    audio.addEventListener("play", () => {
-      icoPlay.innerHTML = `<path d="M6 5h4v14H6zM14 5h4v14h-4z"></path>`;
-    });
-    audio.addEventListener("pause", () => {
-      icoPlay.innerHTML = `<path d="M8 5v14l11-7z"></path>`;
-    });
-
-    audio.addEventListener("timeupdate", updateProgress);
-    audio.addEventListener("loadedmetadata", updateProgress);
-    audio.addEventListener("ended", () => next());
-
-    let seeking = false;
-    seekBar.addEventListener("pointerdown", (e) => { seeking = true; seekToEvent(e); seekBar.setPointerCapture(e.pointerId); });
-    seekBar.addEventListener("pointermove", (e) => { if(seeking) seekToEvent(e); });
-    seekBar.addEventListener("pointerup", () => { seeking = false; });
-
-    function seekToEvent(e){
-      if(!audio.duration || !isFinite(audio.duration)) return;
-      const rect = seekBar.getBoundingClientRect();
-      const x = Math.min(Math.max(0, e.clientX - rect.left), rect.width);
-      audio.currentTime = (x / rect.width) * audio.duration;
+      saveState();
     }
 
     function next(){
       if(!tracks.length) return;
-      if(shuffle && order.length){
-        const pos = order.indexOf(idx);
-        loadIndex(order[(pos+1) % order.length]);
+      if(isShuffle && shuffleOrder.length){
+        const pos = shuffleOrder.indexOf(currentIndex);
+        const nextIdx = shuffleOrder[(pos+1) % shuffleOrder.length];
+        loadIndex(nextIdx);
       }else{
-        loadIndex((idx+1) % tracks.length);
+        loadIndex((currentIndex+1) % tracks.length);
       }
       audio.play().catch(()=>{});
     }
 
     function prev(){
       if(!tracks.length) return;
-      if(shuffle && order.length){
-        const pos = order.indexOf(idx);
-        loadIndex(order[(pos-1+order.length) % order.length]);
+      if(isShuffle && shuffleOrder.length){
+        const pos = shuffleOrder.indexOf(currentIndex);
+        const prevIdx = shuffleOrder[(pos-1+shuffleOrder.length) % shuffleOrder.length];
+        loadIndex(prevIdx);
       }else{
-        loadIndex((idx-1+tracks.length) % tracks.length);
+        loadIndex((currentIndex-1+tracks.length) % tracks.length);
       }
       audio.play().catch(()=>{});
     }
@@ -811,28 +706,35 @@
       hint.classList.toggle("show", !!show);
     }
 
-    // visualization
-    const canvas = document.getElementById(ids.canvas);
+    // ---------- Visualization ----------
+    const canvas = document.getElementById("p_canvas");
     const ctx = canvas.getContext("2d");
     let audioCtx, analyser, srcNode, freqData;
 
-    function initAudioCtx(){
-      if(audioCtx) return;
+    function getAudioCtx(){
+      if(audioCtx) return audioCtx;
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioCtx.createAnalyser();
+      return audioCtx;
+    }
+
+    function initAnalyser(){
+      if(analyser) return;
+      const ac = getAudioCtx();
+      analyser = ac.createAnalyser();
       analyser.fftSize = 256;
       freqData = new Uint8Array(analyser.frequencyBinCount);
 
-      srcNode = audioCtx.createMediaElementSource(audio);
+      srcNode = ac.createMediaElementSource(audio);
       srcNode.connect(analyser);
-      analyser.connect(audioCtx.destination);
+      analyser.connect(ac.destination);
 
       requestAnimationFrame(drawViz);
     }
 
     audio.addEventListener("play", () => {
-      initAudioCtx();
-      if(audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
+      initAnalyser();
+      const ac = getAudioCtx();
+      if(ac.state === "suspended") ac.resume().catch(()=>{});
     });
 
     function drawViz(){
@@ -878,10 +780,74 @@
       c.closePath();
     }
 
+    // ---------- Load tracks from GitHub root ----------
+    async function loadTracks(){
+      const base = `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/contents`;
+      const api = config.path
+        ? `${base}/${encodeURIComponent(config.path)}?ref=${encodeURIComponent(config.branch)}`
+        : `${base}?ref=${encodeURIComponent(config.branch)}`;
+
+      try{
+        const res = await fetch(api, {headers: {"Accept":"application/vnd.github+json"}});
+        if(res.status === 403){ showHint(t.apiLimit, true); return; }
+        if(!res.ok){ showHint(t.noTracks, true); return; }
+
+        const data = await res.json();
+        const items = Array.isArray(data) ? data : [data];
+
+        const exts = [".mp3",".wav",".ogg",".m4a",".aac",".flac"];
+        tracks = items
+          .filter(x => x && x.type === "file" && typeof x.name === "string")
+          .filter(x => exts.some(e => x.name.toLowerCase().endsWith(e)))
+          .map(x => ({ name: x.name, url: x.download_url }));
+
+        plistCount.textContent = String(tracks.length);
+
+        if(!tracks.length){ showHint(t.noTracks, true); return; }
+
+        // восстановим shuffle UI
+        btnShuffle.classList.toggle("active", isShuffle);
+
+        // если shuffle включён, но order невалидный — пересоздадим
+        if(isShuffle && shuffleOrder.length !== tracks.length){
+          shuffleOrder = [...Array(tracks.length).keys()];
+          for(let i=shuffleOrder.length-1;i>0;i--){
+            const j = Math.floor(Math.random()*(i+1));
+            [shuffleOrder[i], shuffleOrder[j]] = [shuffleOrder[j], shuffleOrder[i]];
+          }
+        }
+
+        renderPlaylist();
+
+        // clamp index
+        currentIndex = clampInt(currentIndex, 0, tracks.length-1);
+        loadIndex(currentIndex);
+
+        // ==== ВОССТАНОВЛЕНИЕ ВРЕМЕНИ И ПРОДОЛЖЕНИЕ ====
+        const saved2 = loadState();
+        const restoreTime = saved2?.time ?? 0;
+        const restoreWasPlaying = !!saved2?.isPlaying;
+
+        // выставляем позицию после метаданных
+        audio.addEventListener("loadedmetadata", () => {
+          if(restoreTime > 0 && isFinite(audio.duration) && restoreTime < audio.duration){
+            audio.currentTime = restoreTime;
+            updateProgress();
+          }
+          // попробуем продолжить, если до этого играло
+          if(restoreWasPlaying){
+            audio.play().catch(()=>{});
+          }
+        }, {once:true});
+      }catch(e){
+        showHint(t.noTracks, true);
+      }
+    }
+
     loadTracks();
   }
 
-  // ======== helpers ========
+  // ===== helpers =====
   function fmtTime(s){
     if(!isFinite(s)) return "0:00";
     const m = Math.floor(s/60);

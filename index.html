@@ -11,10 +11,8 @@
       --border: rgba(255,255,255,.12);
       --text: #e9e9ef;
       --muted: rgba(233,233,239,.7);
-
       --accent: #a855f7;
       --accent2:#3b82f6;
-
       --radius: 16px;
     }
     html,body{
@@ -27,7 +25,9 @@
         var(--bg);
     }
     body.playerOnly{ background: rgba(0,0,0,0); }
+    body.playerOnly .app{ display:none; }
 
+    /* ===== EDITOR ===== */
     .app{
       height:100%;
       display:grid;
@@ -36,8 +36,6 @@
       padding: 18px;
       box-sizing:border-box;
     }
-    body.playerOnly .app{ display:none; }
-
     .left{
       background: var(--panel);
       border: 1px solid var(--border);
@@ -83,7 +81,7 @@
     }
     .codeBox{ display:none; margin-top: 10px; }
     textarea{
-      min-height: 120px;
+      min-height: 140px;
       resize: vertical;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       font-size: 12px;
@@ -111,6 +109,9 @@
     iframe{ width:100%; height:100%; border:0; background: transparent; }
 
     /* ===== PLAYER UI ===== */
+    #playerRoot{ display:none; }
+    body.playerOnly #playerRoot{ display:block; }
+
     .wrap{
       min-height: 100vh;
       display:flex;
@@ -119,6 +120,7 @@
       padding: 12px;
       box-sizing:border-box;
     }
+
     .player{
       width: min(760px, 100%);
       background:
@@ -133,6 +135,7 @@
       backdrop-filter: blur(10px);
       color:#fff;
     }
+
     .top{display:flex; gap: 14px; padding: 16px 16px 10px; align-items:center;}
     .cover{
       width: 78px; height: 78px; border-radius: 999px; overflow:hidden; flex:0 0 auto;
@@ -143,6 +146,7 @@
     .meta{min-width:0; flex:1 1 auto;}
     .title{font-size:22px; font-weight:750; line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
     .sub{margin-top:4px; font-size:13px; color: rgba(255,255,255,.7); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
     .icons{display:flex; gap:8px; align-items:center;}
     .iconBtn{
       width:38px; height:38px; border-radius:999px;
@@ -196,6 +200,57 @@
     .badge{ font-size:11px; color: rgba(255,255,255,.85); background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.10); padding:2px 8px; border-radius:999px; }
     .hintP{ padding: 8px 16px 16px; color: rgba(255,255,255,.75); font-size:12px; display:none; line-height:1.35; }
     .hintP.show{ display:block; }
+
+    /* ===== RESUME OVERLAY ===== */
+    .resumeOverlay{
+      position:absolute; inset:0;
+      display:none;
+      align-items:center; justify-content:center;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(6px);
+      z-index: 20;
+    }
+    .resumeOverlay.show{ display:flex; }
+    .resumeCard{
+      background: rgba(20,20,24,.78);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      padding: 14px 14px;
+      width: min(320px, calc(100% - 28px));
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      text-align:center;
+    }
+    .resumeTitle{ font-weight:750; margin-bottom:6px; }
+    .resumeText{ font-size:12px; color: rgba(255,255,255,.75); line-height:1.35; margin-bottom:10px; }
+    .resumeBtn{
+      width:100%;
+      border:0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor:pointer;
+      color:white;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      font-weight: 750;
+    }
+
+    /* ===== MINI MODE ===== */
+    body.uiMini .wrap{ padding:0; min-height:auto; }
+    body.uiMini .player{
+      width: 100%;
+      border-radius: 14px;
+    }
+    body.uiMini .top{ padding: 10px 10px 6px; gap:10px; }
+    body.uiMini .cover{ width:42px; height:42px; }
+    body.uiMini .title{ font-size:13px; }
+    body.uiMini .sub{ font-size:11px; }
+    body.uiMini .icons{ display:none; }          /* убираем like/playlist */
+    body.uiMini .mid{ display:none; }            /* убираем таймлайн */
+    body.uiMini .viz{ display:none; }            /* убираем визуализацию */
+    body.uiMini .bottom{ padding: 0 10px 10px; }
+    body.uiMini .controls{ padding: 4px 10px 4px; gap:8px; justify-content:flex-start;}
+    body.uiMini .btnP{ width:40px; height:40px; }
+    body.uiMini .btnP.big{ width:44px; height:44px; }
+    body.uiMini .vol{ display:none; }            /* громкость убираем в мини */
   </style>
 </head>
 <body>
@@ -205,10 +260,10 @@
     <div class="left">
       <h1>Редактор плеера</h1>
       <div class="desc">
-        Настрой язык и обложку. Потом вставь iframe в Genially.
+        Настрой язык, обложку и режим UI (полный/мини). В Genially вставляй один и тот же iframe на каждой странице.
         <br><br>
-        ⚠️ В Genially без “элемента на всех страницах” музыка физически не может играть бесшовно.
-        Но этот плеер <b>восстанавливает трек/позицию</b> при каждом перелистывании.
+        ⚠️ В большинстве браузеров автозапуск звука в новом iframe может блокироваться.
+        Я добавила: попытку запустить через muted + кнопку “Продолжить музыку”, если браузер запретил.
       </div>
 
       <div class="group">
@@ -225,9 +280,18 @@
         <div class="hint">Пусто → дефолтная обложка.</div>
       </div>
 
+      <div class="group">
+        <label>Вид (UI)</label>
+        <select id="ui">
+          <option value="full">Полный</option>
+          <option value="mini">Мини (фон)</option>
+        </select>
+        <div class="hint">Мини лучше для “фоновой музыки” (iframe можно сделать маленьким и поставить в угол).</div>
+      </div>
+
       <div class="group row">
         <button class="btn secondary" id="btnPreview">Обновить предпросмотр</button>
-        <button class="btn" id="btnCode">Получить ссылку</button>
+        <button class="btn" id="btnCode">Получить iframe</button>
       </div>
 
       <div class="codeBox" id="codeBox">
@@ -238,8 +302,8 @@
           <label>iframe для Genially</label>
           <textarea id="codeArea" readonly></textarea>
           <div class="hint">
-            Вставляй один и тот же iframe на все страницы (один URL).
-            Иначе восстановление не совпадёт.
+            Вставляй этот iframe одинаковым на всех страницах.
+            <br>Если на новом слайде звук не стартует — нажми один раз “Продолжить музыку” (обычно после этого браузер начинает разрешать autoplay).
           </div>
         </div>
 
@@ -257,9 +321,17 @@
   </div>
 
   <!-- PLAYER -->
-  <div id="playerRoot" style="display:none">
+  <div id="playerRoot">
     <div class="wrap">
       <div class="player">
+        <div class="resumeOverlay" id="resumeOverlay">
+          <div class="resumeCard">
+            <div class="resumeTitle" id="resumeTitle">Продолжить музыку</div>
+            <div class="resumeText" id="resumeText">Браузер заблокировал автозапуск на новом слайде. Нажми кнопку — и дальше обычно будет играть автоматически.</div>
+            <button class="resumeBtn" id="resumeBtn">Продолжить</button>
+          </div>
+        </div>
+
         <div class="top">
           <div class="cover"><img id="p_coverImg" alt=""></div>
           <div class="meta">
@@ -325,12 +397,6 @@
               <path d="M16 6h2v12h-2zM4 18V6l10 6z"></path>
             </svg>
           </button>
-
-          <button class="btnP" title="Brand" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2zm4.6 14.5a.9.9 0 0 1-1.25.28c-2.43-1.48-5.5-1.82-9.12-1.0a.9.9 0 1 1-.4-1.76c4.1-.94 7.65-.52 10.44 1.18.42.26.55.82.28 1.3zm1.05-2.66a1.1 1.1 0 0 1-1.52.35c-2.78-1.72-7.02-2.22-10.3-1.22a1.1 1.1 0 1 1-.64-2.1c3.79-1.15 8.51-.59 11.76 1.4.52.32.68.99.35 1.57zm.1-2.85c-3.35-2-8.88-2.18-12.08-1.21a1.3 1.3 0 0 1-.75-2.49c3.67-1.11 9.78-.9 13.67 1.42a1.3 1.3 0 0 1-1.34 2.28z"/>
-            </svg>
-          </button>
         </div>
 
         <div class="bottom">
@@ -368,9 +434,10 @@
     owner: "svetlana18011991",
     repo: "audioplayer",
     branch: "main",
-    path: "",            // треки в корне
+    path: "",
     lang: "ru",
     cover: "",
+    ui: "full",
     volume: 0.8,
     accent: "#a855f7",
     accent2: "#3b82f6",
@@ -383,26 +450,31 @@
     path: (qs.get("path") ?? DEFAULTS.path).replace(/^\/+|\/+$/g,""),
     lang: (qs.get("lang") || DEFAULTS.lang).toLowerCase(),
     cover: qs.get("cover") || DEFAULTS.cover,
+    ui: (qs.get("ui") || DEFAULTS.ui).toLowerCase(),
     volume: clamp01(parseFloat(qs.get("volume") || DEFAULTS.volume)),
     accent: qs.get("accent") || DEFAULTS.accent,
     accent2: qs.get("accent2") || DEFAULTS.accent2,
   };
 
-  // ключ состояния (ВАЖНО: не меняй между страницами)
-  const STORE_KEY = `genially_ap_state_v1:${cfg.owner}/${cfg.repo}/${cfg.branch}/${cfg.path}`;
+  // storage key: должен быть одинаковым на всех страницах
+  const STORE_KEY = `genially_ap_state_v2:${cfg.owner}/${cfg.repo}/${cfg.branch}/${cfg.path}`;
 
-  if(mode === "player"){
+  // ===== PLAYER MODE =====
+  if (mode === "player") {
     document.body.classList.add("playerOnly");
-    document.getElementById("playerRoot").style.display = "block";
+    if (cfg.ui === "mini") document.body.classList.add("uiMini");
+
     document.documentElement.style.setProperty("--accent", cfg.accent);
     document.documentElement.style.setProperty("--accent2", cfg.accent2);
+
     runPlayer(cfg);
     return;
   }
 
-  // ===== EDITOR =====
+  // ===== EDITOR MODE =====
   const langEl = document.getElementById("lang");
   const coverEl = document.getElementById("cover");
+  const uiEl = document.getElementById("ui");
   const btnPreview = document.getElementById("btnPreview");
   const btnCode = document.getElementById("btnCode");
   const codeBox = document.getElementById("codeBox");
@@ -414,16 +486,20 @@
 
   langEl.value = cfg.lang;
   coverEl.value = cfg.cover;
+  uiEl.value = cfg.ui;
 
   function buildPlayerUrl(){
     const base = location.href.split("?")[0];
     const p = new URLSearchParams();
     p.set("mode","player");
     p.set("lang", langEl.value);
-    if(coverEl.value.trim()) p.set("cover", coverEl.value.trim());
+    p.set("ui", uiEl.value);
+    if (coverEl.value.trim()) p.set("cover", coverEl.value.trim());
+
     p.set("owner", cfg.owner);
     p.set("repo", cfg.repo);
     p.set("branch", cfg.branch);
+
     p.set("accent", cfg.accent);
     p.set("accent2", cfg.accent2);
     p.set("volume", String(cfg.volume));
@@ -438,12 +514,17 @@
     const url = buildPlayerUrl();
     playerLink.value = url;
 
+    // Для mini — рекомендуем маленький размер и позиционирование в угол
+    const isMini = (uiEl.value === "mini");
+    const w = isMini ? 320 : 760;
+    const h = isMini ? 110 : 420;
+
     const iframeCode =
 `<iframe
   src="${url}"
-  width="760"
-  height="420"
-  style="border:0;background:transparent;"
+  width="${w}"
+  height="${h}"
+  style="border:0;background:transparent;${isMini ? "position:fixed;right:12px;bottom:12px;z-index:9999;" : ""}"
   allow="autoplay"
   loading="lazy"
 ></iframe>`;
@@ -466,7 +547,7 @@
 
   updatePreview();
 
-  // ===== PLAYER =====
+  // ===== PLAYER LOGIC =====
   function runPlayer(config){
     const i18n = {
       ru: {
@@ -474,14 +555,20 @@
         playlist:"Плейлист",
         vol:"Громкость",
         noTracks:"Не нашёл аудиофайлы в корне репозитория. Проверь public и форматы mp3/wav/ogg/m4a/aac/flac.",
-        apiLimit:"GitHub API ограничил запросы. Подождите и попробуйте снова."
+        apiLimit:"GitHub API ограничил запросы. Подождите и попробуйте снова.",
+        resumeTitle:"Продолжить музыку",
+        resumeText:"Браузер заблокировал автозапуск на новом слайде. Нажми кнопку — обычно дальше будет играть автоматически.",
+        resumeBtn:"Продолжить"
       },
       en: {
         loading:"Loading…",
         playlist:"Playlist",
         vol:"Volume",
         noTracks:"No audio files found in repo root. Check repo is public and audio formats.",
-        apiLimit:"GitHub API rate limit hit. Wait and try again."
+        apiLimit:"GitHub API rate limit hit. Wait and try again.",
+        resumeTitle:"Resume audio",
+        resumeText:"Autoplay was blocked on the new slide. Tap the button to resume.",
+        resumeBtn:"Resume"
       }
     };
     const t = i18n[config.lang] || i18n.ru;
@@ -513,13 +600,21 @@
     const volRange = document.getElementById("p_volRange");
     const hint = document.getElementById("p_hint");
 
+    const resumeOverlay = document.getElementById("resumeOverlay");
+    const resumeTitle = document.getElementById("resumeTitle");
+    const resumeText  = document.getElementById("resumeText");
+    const resumeBtn   = document.getElementById("resumeBtn");
+
+    resumeTitle.textContent = t.resumeTitle;
+    resumeText.textContent  = t.resumeText;
+    resumeBtn.textContent   = t.resumeBtn;
+
     trackTitle.textContent = t.loading;
     plistTitle.textContent = t.playlist;
     volLabel.textContent = t.vol;
     trackSub.textContent = `${config.owner}/${config.repo}${config.path?"/"+config.path:""}`;
     coverImg.src = config.cover || svgPlaceholder(config.accent, config.accent2);
 
-    // ---------- State helpers ----------
     function loadState(){
       try{ return JSON.parse(localStorage.getItem(STORE_KEY)); }
       catch{ return null; }
@@ -540,10 +635,8 @@
 
     const saved = loadState();
 
-    // playlist state
     let tracks = [];
-    let currentIndex = saved?.trackIndex ?? 0;
-
+    let currentIndex = clampInt(saved?.trackIndex ?? 0, 0, 999999);
     let isShuffle = !!(saved?.shuffle ?? false);
     let shuffleOrder = Array.isArray(saved?.order) ? saved.order : [];
 
@@ -555,7 +648,6 @@
       saveState();
     });
 
-    // ---------- Controls ----------
     btnPlay.addEventListener("click", () => {
       if(audio.paused) audio.play().catch(()=>{});
       else audio.pause();
@@ -580,10 +672,11 @@
       saveState();
     });
 
-    btnPlaylist.addEventListener("click", () => playlistEl.classList.toggle("open"));
-    btnLike.addEventListener("click", () => btnLike.classList.toggle("active"));
+    if (btnPlaylist) btnPlaylist.addEventListener("click", () => playlistEl.classList.toggle("open"));
+    if (btnLike) btnLike.addEventListener("click", () => btnLike.classList.toggle("active"));
 
     document.addEventListener("click", (e) => {
+      if (!playlistEl || !btnPlaylist) return;
       const inside = playlistEl.contains(e.target) || btnPlaylist.contains(e.target);
       if(!inside) playlistEl.classList.remove("open");
     });
@@ -600,14 +693,12 @@
 
     audio.addEventListener("timeupdate", () => {
       updateProgress();
-      // сохраняем примерно раз в 2 секунды
       if(Math.floor(audio.currentTime) % 2 === 0) saveState();
     });
 
     audio.addEventListener("loadedmetadata", updateProgress);
     audio.addEventListener("ended", () => next());
 
-    // seek
     let seeking = false;
     seekBar.addEventListener("pointerdown", (e) => { seeking = true; seekToEvent(e); seekBar.setPointerCapture(e.pointerId); });
     seekBar.addEventListener("pointermove", (e) => { if(seeking) seekToEvent(e); });
@@ -621,8 +712,8 @@
       updateProgress();
     }
 
-    // ---------- Playlist render ----------
     function renderPlaylist(){
+      if(!plistItems) return;
       plistItems.innerHTML = "";
       tracks.forEach((tr, i) => {
         const row = document.createElement("div");
@@ -642,7 +733,7 @@
 
         row.addEventListener("click", () => {
           loadIndex(i);
-          audio.play().catch(()=>{});
+          tryPlayWithFallback(true);
         });
 
         plistItems.appendChild(row);
@@ -651,6 +742,7 @@
     }
 
     function markActive(){
+      if(!plistItems) return;
       [...plistItems.querySelectorAll(".track")].forEach(el => {
         el.classList.toggle("active", parseInt(el.dataset.i,10) === currentIndex);
       });
@@ -660,8 +752,10 @@
       currentIndex = clampInt(i, 0, tracks.length-1);
       const tr = tracks[currentIndex];
       audio.src = tr.url;
+
       trackTitle.textContent = prettifyName(tr.name);
       trackSub.textContent = `${config.owner}/${config.repo}${config.path?"/"+config.path:""}`;
+
       markActive();
       updateProgress();
       saveState();
@@ -676,7 +770,7 @@
       }else{
         loadIndex((currentIndex+1) % tracks.length);
       }
-      audio.play().catch(()=>{});
+      tryPlayWithFallback(true);
     }
 
     function prev(){
@@ -688,7 +782,7 @@
       }else{
         loadIndex((currentIndex-1+tracks.length) % tracks.length);
       }
-      audio.play().catch(()=>{});
+      tryPlayWithFallback(true);
     }
 
     function updateProgress(){
@@ -706,7 +800,48 @@
       hint.classList.toggle("show", !!show);
     }
 
-    // ---------- Visualization ----------
+    // ---- autoplay best-effort ----
+    async function tryPlayWithFallback(userInitiated){
+      // 1) обычная попытка
+      try{
+        await audio.play();
+        resumeOverlay.classList.remove("show");
+        return true;
+      }catch(e1){
+        // 2) попытка через muted autoplay (часто разрешают)
+        try{
+          const prevMuted = audio.muted;
+          audio.muted = true;
+          await audio.play();
+          // попробуем размьютить (иногда разрешают сразу после старта)
+          setTimeout(() => {
+            audio.muted = prevMuted;
+          }, 250);
+          resumeOverlay.classList.remove("show");
+          return true;
+        }catch(e2){
+          // 3) показать кнопку (нужен клик)
+          if(!userInitiated){
+            resumeOverlay.classList.add("show");
+          }
+          return false;
+        }
+      }
+    }
+
+    resumeBtn.addEventListener("click", async () => {
+      resumeOverlay.classList.remove("show");
+      // клик — это жест пользователя, тут play обычно проходит
+      try{
+        audio.muted = false;
+        await audio.play();
+      }catch{
+        // если вдруг не получилось — вернём оверлей
+        resumeOverlay.classList.add("show");
+      }
+    });
+
+    // ---- visualization (можно отключить в mini) ----
     const canvas = document.getElementById("p_canvas");
     const ctx = canvas.getContext("2d");
     let audioCtx, analyser, srcNode, freqData;
@@ -716,7 +851,6 @@
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       return audioCtx;
     }
-
     function initAnalyser(){
       if(analyser) return;
       const ac = getAudioCtx();
@@ -730,8 +864,8 @@
 
       requestAnimationFrame(drawViz);
     }
-
     audio.addEventListener("play", () => {
+      // в mini может быть скрыт canvas — но это не мешает
       initAnalyser();
       const ac = getAudioCtx();
       if(ac.state === "suspended") ac.resume().catch(()=>{});
@@ -769,7 +903,6 @@
         ctx.fill();
       }
     }
-
     function roundRect(c, x, y, w, h, r){
       c.beginPath();
       c.moveTo(x+r, y);
@@ -780,7 +913,7 @@
       c.closePath();
     }
 
-    // ---------- Load tracks from GitHub root ----------
+    // ---- Load tracks from GitHub root ----
     async function loadTracks(){
       const base = `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/contents`;
       const api = config.path
@@ -801,14 +934,11 @@
           .filter(x => exts.some(e => x.name.toLowerCase().endsWith(e)))
           .map(x => ({ name: x.name, url: x.download_url }));
 
-        plistCount.textContent = String(tracks.length);
-
+        if(plistCount) plistCount.textContent = String(tracks.length);
         if(!tracks.length){ showHint(t.noTracks, true); return; }
 
-        // восстановим shuffle UI
         btnShuffle.classList.toggle("active", isShuffle);
 
-        // если shuffle включён, но order невалидный — пересоздадим
         if(isShuffle && shuffleOrder.length !== tracks.length){
           shuffleOrder = [...Array(tracks.length).keys()];
           for(let i=shuffleOrder.length-1;i>0;i--){
@@ -819,27 +949,26 @@
 
         renderPlaylist();
 
-        // clamp index
         currentIndex = clampInt(currentIndex, 0, tracks.length-1);
         loadIndex(currentIndex);
 
-        // ==== ВОССТАНОВЛЕНИЕ ВРЕМЕНИ И ПРОДОЛЖЕНИЕ ====
+        // ==== restore time + try continue ====
         const saved2 = loadState();
         const restoreTime = saved2?.time ?? 0;
         const restoreWasPlaying = !!saved2?.isPlaying;
 
-        // выставляем позицию после метаданных
-        audio.addEventListener("loadedmetadata", () => {
+        audio.addEventListener("loadedmetadata", async () => {
           if(restoreTime > 0 && isFinite(audio.duration) && restoreTime < audio.duration){
             audio.currentTime = restoreTime;
             updateProgress();
           }
-          // попробуем продолжить, если до этого играло
           if(restoreWasPlaying){
-            audio.play().catch(()=>{});
+            // попытка продолжить автоматически
+            await tryPlayWithFallback(false);
           }
-        }, {once:true});
-      }catch(e){
+        }, { once:true });
+
+      }catch{
         showHint(t.noTracks, true);
       }
     }
@@ -847,7 +976,7 @@
     loadTracks();
   }
 
-  // ===== helpers =====
+  // helpers
   function fmtTime(s){
     if(!isFinite(s)) return "0:00";
     const m = Math.floor(s/60);

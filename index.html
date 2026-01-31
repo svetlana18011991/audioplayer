@@ -3,589 +3,776 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Genially Audio Player Editor</title>
+  <title>Audio Player</title>
   <style>
     :root{
-      --bg:#0b0b12;
-      --panel:#12121acc;
-      --line:#ffffff1f;
-      --txt:#f5f5ff;
-      --mut:#b9b9d3;
-      --a:#b33bff;
-      --a2:#7a2bff;
-      --r:18px;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      --bg: rgba(0,0,0,0);       /* прозрачный фон */
+      --card: rgba(20,20,24,.55);
+      --cardBorder: rgba(255,255,255,.12);
+      --text: #ffffff;
+      --muted: rgba(255,255,255,.7);
+
+      /* “как на скрине” — фиолетово-синий */
+      --accent: #a855f7;
+      --accent2:#3b82f6;
+
+      --btn: rgba(255,255,255,.14);
+      --btnHover: rgba(255,255,255,.22);
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius: 18px;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; min-height:100vh; color:var(--txt);
+
+    html,body{
+      height:100%;
+      margin:0;
+      background: var(--bg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+    }
+
+    .wrap{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 12px;
+      box-sizing:border-box;
+    }
+
+    .player{
+      width: min(760px, 100%);
       background:
-        radial-gradient(900px 500px at 20% 10%, rgba(179,59,255,.25), transparent 60%),
-        radial-gradient(900px 500px at 80% 90%, rgba(122,43,255,.18), transparent 60%),
-        var(--bg);
+        radial-gradient(800px 280px at 0% 0%, rgba(168,85,247,.42), transparent 60%),
+        radial-gradient(800px 280px at 100% 100%, rgba(59,130,246,.34), transparent 60%),
+        var(--card);
+      border: 1px solid var(--cardBorder);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position: relative;
+      backdrop-filter: blur(10px);
     }
-    .wrap{max-width:1200px;margin:24px auto;padding:0 16px 28px;display:grid;grid-template-columns:420px 1fr;gap:16px}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 18px 55px rgba(0,0,0,.35);overflow:hidden}
-    h2{margin:0;padding:14px 16px;font-size:14px;letter-spacing:.3px;text-transform:uppercase;border-bottom:1px solid var(--line);color:#eaeaff}
-    .c{padding:14px 16px}
-    label{display:block;font-size:12px;color:var(--mut);margin:0 0 6px}
-    input,select,textarea{
-      width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);
-      background:#0f0f18;color:var(--txt);outline:none
+
+    .top{
+      display:flex;
+      gap: 14px;
+      padding: 16px 16px 10px;
+      align-items:center;
     }
-    input[type=color]{height:40px;padding:4px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .row{display:flex;gap:10px;align-items:center}.row>*{flex:1}
-    .hint{font-size:12px;color:var(--mut);line-height:1.35;margin-top:8px}
-    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    button{
-      cursor:pointer;border:0;border-radius:14px;padding:10px 12px;font-weight:700;color:#fff;
-      background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 10px 28px rgba(179,59,255,.24)
+
+    .cover{
+      width: 78px;
+      height: 78px;
+      border-radius: 999px;
+      overflow:hidden;
+      flex: 0 0 auto;
+      border: 2px solid rgba(255,255,255,.18);
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      background: rgba(255,255,255,.08);
     }
-    button.secondary{background:#ffffff12;box-shadow:none;border:1px solid var(--line);color:var(--txt);font-weight:600}
-    .stage{
-      padding:16px;display:flex;justify-content:center;align-items:center;min-height:360px;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px) 0 0/16px 16px,
-        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px) 0 0/16px 16px;
+    .cover img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
     }
-    .codebox{display:none;margin-top:10px}
-    textarea{min-height:260px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.45}
-    @media (max-width:980px){.wrap{grid-template-columns:1fr}}
+
+    .meta{
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    .title{
+      font-size: 22px;
+      font-weight: 750;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .sub{
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    .icons{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+    }
+    .iconBtn{
+      width: 38px; height: 38px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.10);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      transition: .15s ease;
+      user-select:none;
+    }
+    .iconBtn:hover{ background: rgba(255,255,255,.18); }
+    .iconBtn.active{
+      border-color: rgba(255,255,255,.28);
+      box-shadow: 0 0 0 3px rgba(168,85,247,.20);
+    }
+
+    .mid{
+      padding: 0 16px 10px;
+    }
+
+    .timelineRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .time{
+      width: 46px;
+      text-align:center;
+      font-variant-numeric: tabular-nums;
+    }
+    .bar{
+      flex: 1 1 auto;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      position: relative;
+      cursor:pointer;
+      overflow:hidden;
+    }
+    .barFill{
+      position:absolute;
+      inset:0;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 999px;
+    }
+    .barKnob{
+      position:absolute;
+      top:50%;
+      transform: translate(-50%,-50%);
+      left: 0%;
+      width: 14px; height: 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 18px rgba(0,0,0,.25);
+      pointer-events:none;
+    }
+
+    .controls{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      padding: 2px 16px 10px;
+    }
+    .btn{
+      width: 48px; height: 48px;
+      border-radius: 999px;
+      border: 0;
+      background: var(--btn);
+      color: var(--text);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      transition: .15s ease;
+    }
+    .btn:hover{ background: var(--btnHover); }
+    .btn.big{
+      width: 58px; height: 58px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.16);
+    }
+    svg{ width: 22px; height: 22px; }
+
+    .bottom{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      padding: 0 16px 14px;
+    }
+    .vol{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex: 1 1 auto;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    input[type="range"]{
+      width: 100%;
+      accent-color: var(--accent);
+      cursor:pointer;
+    }
+
+    .viz{
+      height: 62px;
+      padding: 0 16px 16px;
+    }
+    canvas{
+      width: 100%;
+      height: 62px;
+      display:block;
+      background: rgba(0,0,0,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+    }
+
+    .playlist{
+      position:absolute;
+      right: 12px;
+      top: 92px;
+      width: min(340px, calc(100% - 24px));
+      max-height: 340px;
+      background: rgba(16,16,18,.92);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      overflow:hidden;
+      display:none;
+      backdrop-filter: blur(10px);
+      z-index: 5;
+    }
+    .playlist.open{ display:block; }
+    .plistHead{
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .plistItems{
+      max-height: 300px;
+      overflow:auto;
+    }
+    .track{
+      padding: 10px 12px;
+      cursor:pointer;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .track:hover{ background: rgba(255,255,255,.06); }
+    .track.active{ background: rgba(168,85,247,.18); }
+    .tname{
+      flex: 1 1 auto;
+      min-width:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-size: 13px;
+    }
+    .badge{
+      font-size: 11px;
+      color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .hint{
+      padding: 8px 16px 16px;
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+      display:none;
+      line-height:1.35;
+    }
+    .hint.show{ display:block; }
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="player">
+      <div class="top">
+        <div class="cover"><img id="coverImg" alt=""></div>
 
-<div class="wrap">
-  <!-- SETTINGS -->
-  <div class="card">
-    <h2>Настройки</h2>
-    <div class="c">
-      <div class="grid">
-        <div>
-          <label>Язык</label>
-          <select id="lang">
-            <option value="ru" selected>Русский</option>
-            <option value="en">English</option>
-          </select>
+        <div class="meta">
+          <div class="title" id="trackTitle">Загрузка…</div>
+          <div class="sub" id="trackSub">—</div>
         </div>
 
-        <div>
-          <label>Показывать громкость</label>
-          <select id="showVol">
-            <option value="1" selected>Да</option>
-            <option value="0">Нет</option>
-          </select>
-        </div>
+        <div class="icons">
+          <button class="iconBtn" id="btnLike" title="Like">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
+            </svg>
+          </button>
 
-        <div><label>Акцент</label><input id="a" type="color" value="#b33bff"></div>
-        <div><label>2-й цвет</label><input id="a2" type="color" value="#7a2bff"></div>
-
-        <div><label>Текст</label><input id="txt" type="color" value="#ffffff"></div>
-        <div><label>Вторичный</label><input id="mut" type="color" value="#c7c7e6"></div>
-
-        <div><label>Радиус (px)</label><input id="rad" value="22"></div>
-        <div><label>Высота (px)</label><input id="hgt" value="220"></div>
-      </div>
-
-      <div style="height:12px"></div>
-      <label>GitHub папка (ссылка на tree/...)</label>
-      <input id="gh" type="url" value="https://github.com/svetlana18011991/audioplayer/tree/main/audio">
-      <div class="hint">
-        Репозиторий должен быть публичным. В папке должны лежать mp3/ogg/wav/m4a.
-      </div>
-
-      <div style="height:12px"></div>
-      <div class="row">
-        <div>
-          <label>Обложка (URL)</label>
-          <input id="coverUrl" type="url" placeholder="https://.../image.jpg">
-        </div>
-        <div>
-          <label>или файл</label>
-          <input id="coverFile" type="file" accept="image/*">
+          <button class="iconBtn" id="btnPlaylist" title="Playlist">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 6h13"></path>
+              <path d="M8 12h13"></path>
+              <path d="M8 18h13"></path>
+              <path d="M3 6h.01"></path>
+              <path d="M3 12h.01"></path>
+              <path d="M3 18h.01"></path>
+            </svg>
+          </button>
         </div>
       </div>
 
-      <div class="btns">
-        <button id="apply">Обновить предпросмотр</button>
-        <button id="gen" class="secondary">Получить код для Genially</button>
-        <button id="copy" class="secondary" style="display:none">Копировать код</button>
+      <div class="mid">
+        <div class="timelineRow">
+          <div class="time" id="curTime">0:00</div>
+          <div class="bar" id="seekBar">
+            <div class="barFill" id="barFill"></div>
+            <div class="barKnob" id="barKnob"></div>
+          </div>
+          <div class="time" id="durTime">0:00</div>
+        </div>
       </div>
 
-      <div class="hint">
-        Если GitHub-папка не загрузилась — в плеере будет сообщение об ошибке.
+      <div class="controls">
+        <button class="btn" id="btnShuffle" title="Shuffle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 3h5v5"></path>
+            <path d="M4 20l6-6"></path>
+            <path d="M16 3l-6 6"></path>
+            <path d="M16 21h5v-5"></path>
+            <path d="M4 4l6 6"></path>
+            <path d="M21 16l-6-6"></path>
+          </svg>
+        </button>
+
+        <button class="btn" id="btnPrev" title="Prev">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6h2v12H6zM20 6v12l-10-6z"></path>
+          </svg>
+        </button>
+
+        <button class="btn big" id="btnPlay" title="Play/Pause">
+          <svg id="icoPlay" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
+        </button>
+
+        <button class="btn" id="btnNext" title="Next">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 6h2v12h-2zM4 18V6l10 6z"></path>
+          </svg>
+        </button>
+
+        <button class="btn" id="btnBrand" title="Brand">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2zm4.6 14.5a.9.9 0 0 1-1.25.28c-2.43-1.48-5.5-1.82-9.12-1.0a.9.9 0 1 1-.4-1.76c4.1-.94 7.65-.52 10.44 1.18.42.26.55.82.28 1.3zm1.05-2.66a1.1 1.1 0 0 1-1.52.35c-2.78-1.72-7.02-2.22-10.3-1.22a1.1 1.1 0 1 1-.64-2.1c3.79-1.15 8.51-.59 11.76 1.4.52.32.68.99.35 1.57zm.1-2.85c-3.35-2-8.88-2.18-12.08-1.21a1.3 1.3 0 0 1-.75-2.49c3.67-1.11 9.78-.9 13.67 1.42a1.3 1.3 0 0 1-1.34 2.28z"/>
+          </svg>
+        </button>
       </div>
+
+      <div class="bottom">
+        <div class="vol">
+          <span id="volLabel">Громкость</span>
+          <input type="range" id="volRange" min="0" max="1" step="0.01" value="0.8">
+        </div>
+      </div>
+
+      <div class="viz">
+        <canvas id="canvas" width="900" height="124"></canvas>
+      </div>
+
+      <div class="hint" id="hint"></div>
+
+      <div class="playlist" id="playlist">
+        <div class="plistHead">
+          <span id="plistTitle">Плейлист</span>
+          <span class="badge" id="plistCount">0</span>
+        </div>
+        <div class="plistItems" id="plistItems"></div>
+      </div>
+
+      <audio id="audio" crossorigin="anonymous"></audio>
     </div>
   </div>
-
-  <!-- PREVIEW + CODE -->
-  <div class="card">
-    <h2>Предпросмотр</h2>
-    <div class="stage">
-      <div id="mount" style="width:min(820px,100%)"></div>
-    </div>
-
-    <div class="c codebox" id="codeBox">
-      <div class="row" style="margin-bottom:8px;align-items:center">
-        <div style="font-size:12px;color:var(--mut)"><b>Код для Genially</b></div>
-        <div style="flex:1"></div>
-        <button id="close" class="secondary">Закрыть</button>
-      </div>
-      <textarea id="code" spellcheck="false"></textarea>
-    </div>
-  </div>
-</div>
 
 <script>
-  const $ = (id) => document.getElementById(id);
-
-  const state = { coverData:null };
-
-  $('coverFile').addEventListener('change', async () => {
-    const f = $('coverFile').files?.[0];
-    if(!f) return;
-    state.coverData = await new Promise((res,rej)=>{
-      const r = new FileReader();
-      r.onload = ()=>res(r.result);
-      r.onerror = rej;
-      r.readAsDataURL(f);
-    });
-    $('coverUrl').value = '';
-    renderPreview();
-  });
-
-  $('apply').onclick = renderPreview;
-
-  $('gen').onclick = () => {
-    const cfg = getCfg();
-    const html = buildPlayerHtml(cfg);
-    const b64 = toBase64(html);
-
-    // Genially-friendly iframe: data:text/html;base64,...
-    const iframeCode =
-`<iframe
-  src="data:text/html;base64,${b64}"
-  style="width:100%;height:${cfg.height}px;border:0;background:transparent;"
-  allow="autoplay"
-></iframe>`;
-
-    $('code').value = iframeCode;
-    $('codeBox').style.display = 'block';
-    $('copy').style.display = 'inline-flex';
-    window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
+(() => {
+  // =========================
+  // НАСТРОЙКА: ТРЕКИ В КОРНЕ
+  // =========================
+  const DEFAULTS = {
+    owner: "svetlana18011991",
+    repo: "audioplayer",
+    branch: "main",
+    path: "",               // <-- ПУСТО: значит корень репозитория
+    lang: "ru",
+    cover: "",              // можно дать URL
+    accent: "#a855f7",
+    accent2:"#3b82f6",
+    text: "#ffffff",
+    volume: 0.8,
+    autoplay: false
   };
 
-  $('close').onclick = () => {
-    $('codeBox').style.display = 'none';
-    $('copy').style.display = 'none';
+  const qs = new URLSearchParams(location.search);
+  const cfg = {
+    owner: qs.get("owner") || DEFAULTS.owner,
+    repo: qs.get("repo") || DEFAULTS.repo,
+    branch: qs.get("branch") || DEFAULTS.branch,
+    path: (qs.get("path") ?? DEFAULTS.path).replace(/^\/+|\/+$/g,""), // "" -> корень
+    lang: (qs.get("lang") || DEFAULTS.lang).toLowerCase(),
+    cover: qs.get("cover") || DEFAULTS.cover,
+    accent: qs.get("accent") || DEFAULTS.accent,
+    accent2: qs.get("accent2") || DEFAULTS.accent2,
+    text: qs.get("text") || DEFAULTS.text,
+    volume: clamp01(parseFloat(qs.get("volume") || DEFAULTS.volume)),
+    autoplay: (qs.get("autoplay")==="1") || DEFAULTS.autoplay
   };
 
-  $('copy').onclick = async () => {
-    try{
-      await navigator.clipboard.writeText($('code').value);
-      $('copy').textContent = 'Скопировано ✓';
-      setTimeout(()=> $('copy').textContent='Копировать код', 1200);
-    }catch(e){
-      alert('Не удалось скопировать автоматически. Скопируй вручную из поля.');
+  document.documentElement.style.setProperty("--accent", cfg.accent);
+  document.documentElement.style.setProperty("--accent2", cfg.accent2);
+  document.documentElement.style.setProperty("--text", cfg.text);
+
+  const i18n = {
+    ru: {
+      loading: "Загрузка…",
+      playlist: "Плейлист",
+      vol: "Громкость",
+      noTracks: "Не нашёл аудиофайлы в корне репозитория. Проверьте, что файлы .mp3/.wav/.ogg/.m4a лежат в корне и репозиторий public.",
+      apiLimit: "GitHub API ограничил запросы. Подождите и попробуйте снова."
+    },
+    en: {
+      loading: "Loading…",
+      playlist: "Playlist",
+      vol: "Volume",
+      noTracks: "No audio files found in repo root. Check that audio files are in the root and repo is public.",
+      apiLimit: "GitHub API rate limit hit. Wait and try again."
     }
   };
+  const t = i18n[cfg.lang] || i18n.ru;
 
-  function clampInt(v,min,max,def){
-    const n = parseInt(String(v||'').trim(),10);
-    if(Number.isNaN(n)) return def;
-    return Math.max(min, Math.min(max, n));
-  }
+  // DOM
+  const audio = document.getElementById("audio");
+  const coverImg = document.getElementById("coverImg");
+  const trackTitle = document.getElementById("trackTitle");
+  const trackSub = document.getElementById("trackSub");
+  const curTime = document.getElementById("curTime");
+  const durTime = document.getElementById("durTime");
+  const seekBar = document.getElementById("seekBar");
+  const barFill = document.getElementById("barFill");
+  const barKnob = document.getElementById("barKnob");
 
-  function getCfg(){
-    return {
-      lang: $('lang').value,
-      showVol: $('showVol').value === '1',
-      accent: $('a').value,
-      accent2: $('a2').value,
-      text: $('txt').value,
-      muted: $('mut').value,
-      radius: clampInt($('rad').value, 0, 60, 22),
-      height: clampInt($('hgt').value, 140, 420, 220),
-      ghFolder: $('gh').value.trim(),
-      cover: (state.coverData || $('coverUrl').value.trim() || '')
-    };
-  }
+  const btnPlay = document.getElementById("btnPlay");
+  const icoPlay = document.getElementById("icoPlay");
+  const btnPrev = document.getElementById("btnPrev");
+  const btnNext = document.getElementById("btnNext");
+  const btnShuffle = document.getElementById("btnShuffle");
+  const btnPlaylist = document.getElementById("btnPlaylist");
+  const btnLike = document.getElementById("btnLike");
 
-  function toBase64(str){
-    // UTF-8 safe base64
-    return btoa(unescape(encodeURIComponent(str)));
-  }
+  const playlistEl = document.getElementById("playlist");
+  const plistTitle = document.getElementById("plistTitle");
+  const plistCount = document.getElementById("plistCount");
+  const plistItems = document.getElementById("plistItems");
 
-  function renderPreview(){
-    const cfg = getCfg();
-    const html = buildPlayerHtml(cfg);
+  const volLabel = document.getElementById("volLabel");
+  const volRange = document.getElementById("volRange");
+  const hint = document.getElementById("hint");
 
-    // Предпросмотр внутри этой страницы через iframe (самый надёжный способ)
-    $('mount').innerHTML =
-      `<iframe
-        style="width:100%;height:${cfg.height}px;border:0;background:transparent;"
-        src="data:text/html;base64,${toBase64(html)}"
-        allow="autoplay"
-      ></iframe>`;
-  }
+  // init text
+  trackTitle.textContent = t.loading;
+  plistTitle.textContent = t.playlist;
+  volLabel.textContent = t.vol;
+  trackSub.textContent = `${cfg.owner}/${cfg.repo}${cfg.path ? "/" + cfg.path : ""}`;
 
-  function buildPlayerHtml(cfg){
-    const i18n = {
-      ru: { playlist:"Плейлист", shuffle:"Рандом", vol:"Громкость", error:"Не удалось загрузить папку GitHub. Проверь ссылку/публичность." },
-      en: { playlist:"Playlist", shuffle:"Shuffle", vol:"Volume", error:"Failed to load GitHub folder. Check link/public repo." }
-    }[cfg.lang] || i18n?.ru;
+  coverImg.src = cfg.cover || svgPlaceholder(cfg.accent, cfg.accent2);
 
-    // Внутри этого HTML ВСЁ автономно и без внешних библиотек
-    return `<!doctype html>
-<html lang="${cfg.lang}">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<style>
-  :root{
-    --a:${cfg.accent};
-    --a2:${cfg.accent2};
-    --tx:${cfg.text};
-    --mu:${cfg.muted};
-    --rad:${cfg.radius}px;
-  }
-  html,body{height:100%;margin:0;background:transparent;}
-  body{display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;}
-  .p{
-    width:100%;height:${cfg.height}px;box-sizing:border-box;padding:14px;border-radius:var(--rad);
-    backdrop-filter:blur(10px);
-    background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
-    border:1px solid rgba(255,255,255,.18);
-    box-shadow:0 18px 50px rgba(0,0,0,.35);
-    color:var(--tx);
-    position:relative;
-    overflow:hidden;
-  }
-  .top{display:flex;gap:14px;align-items:center;}
-  .cv{width:96px;height:96px;border-radius:50%;overflow:hidden;flex:0 0 auto;border:3px solid rgba(255,255,255,.2);background:rgba(0,0,0,.15)}
-  .cv img{width:100%;height:100%;object-fit:cover;display:block;}
-  .m{flex:1;min-width:0}
-  .t{font-size:18px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .s{font-size:13px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  // volume
+  audio.volume = cfg.volume;
+  volRange.value = String(cfg.volume);
+  volRange.addEventListener("input", () => audio.volume = clamp01(parseFloat(volRange.value)));
 
-  .icons{display:flex;gap:8px}
-  .ib{width:36px;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.10);display:grid;place-items:center;cursor:pointer;user-select:none}
-  .ib.active{box-shadow:0 10px 26px rgba(179,59,255,.22);border-color:color-mix(in oklab, var(--a) 60%, rgba(255,255,255,.18));}
-
-  .prog{display:grid;grid-template-columns:46px 1fr 46px;gap:10px;align-items:center;margin-top:10px;font-size:12px;color:var(--mu)}
-  input[type=range]{width:100%;accent-color:var(--a)}
-
-  .ctrl{display:flex;align-items:center;gap:10px;margin-top:10px}
-  .b{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;cursor:pointer;user-select:none;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2)}
-  .b.main{width:54px;height:54px;border:none;background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 12px 30px rgba(179,59,255,.25)}
-
-  .vol{margin-left:auto;display:${cfg.showVol ? 'flex' : 'none'};align-items:center;gap:8px;min-width:180px}
-  .vol span{font-size:12px;color:var(--mu)}
-  .listWrap{position:absolute;right:14px;top:64px;width:min(420px, calc(100% - 28px));max-height:calc(100% - 78px);
-    border-radius:16px;border:1px solid rgba(255,255,255,.18);
-    background:rgba(10,10,18,.82);backdrop-filter:blur(10px);box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden;display:none}
-  .listWrap.open{display:block}
-  .lh{padding:10px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.12)}
-  .lh b{font-size:12px;letter-spacing:.3px;text-transform:uppercase}
-  .st{margin-left:auto;font-size:12px;color:var(--mu)}
-  .list{max-height:300px;overflow:auto}
-  .it{padding:10px 12px;display:flex;gap:10px;align-items:center;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.08)}
-  .it:hover{background:rgba(255,255,255,.06)}
-  .it.active{background:rgba(179,59,255,.14)}
-  .num{width:26px;color:var(--mu);font-variant-numeric:tabular-nums}
-  .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .err{margin-top:10px;font-size:12px;color:var(--mu)}
-</style>
-</head>
-<body>
-  <div class="p">
-    <div class="top">
-      <div class="cv"><img id="cv" alt=""></div>
-      <div class="m">
-        <div class="t" id="tt">—</div>
-        <div class="s" id="sb">—</div>
-      </div>
-      <div class="icons">
-        <div class="ib" id="sh" title="${escapeHtml(i18n.shuffle)}">⤮</div>
-        <div class="ib" id="plBtn" title="${escapeHtml(i18n.playlist)}">≡</div>
-      </div>
-    </div>
-
-    <div class="prog">
-      <div id="tc">0:00</div>
-      <input id="rg" type="range" min="0" max="1000" value="0" />
-      <div id="td">0:00</div>
-    </div>
-
-    <div class="ctrl">
-      <div class="b" id="pv">⏮</div>
-      <div class="b main" id="pp">▶</div>
-      <div class="b" id="nx">⏭</div>
-
-      <div class="vol" id="vb">
-        <span>${escapeHtml(i18n.vol)}</span>
-        <input id="vv" type="range" min="0" max="100" value="80" />
-      </div>
-    </div>
-
-    <div class="err" id="err"></div>
-
-    <div class="listWrap" id="lw">
-      <div class="lh">
-        <b>${escapeHtml(i18n.playlist)}</b>
-        <div class="st" id="st">—</div>
-      </div>
-      <div class="list" id="li"></div>
-    </div>
-  </div>
-
-<script>
-  const GH_FOLDER = ${JSON.stringify(cfg.ghFolder)};
-  const COVER = ${JSON.stringify(cfg.cover || "")};
-  const ERR_TEXT = ${JSON.stringify(i18n.error)};
-  const EXT = /\\.(mp3|ogg|wav|m4a)$/i;
-
-  const a = new Audio();
-  a.preload = "metadata";
-  a.crossOrigin = "anonymous";
-  a.volume = 0.8;
-
+  // playlist state
   let tracks = [];
   let idx = 0;
-  let playing = false;
   let shuffle = false;
   let order = [];
-  let listOpen = false;
 
-  const $ = (id)=>document.getElementById(id);
+  // LOAD from GitHub root
+  async function loadTracks(){
+    // for root: .../contents/?ref=main
+    const base = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents`;
+    const api = cfg.path
+      ? `${base}/${encodeURIComponent(cfg.path)}?ref=${encodeURIComponent(cfg.branch)}`
+      : `${base}?ref=${encodeURIComponent(cfg.branch)}`;
 
-  function setCover(){
-    if(COVER){
-      $("cv").src = COVER;
-      return;
+    try{
+      const res = await fetch(api, {headers: {"Accept":"application/vnd.github+json"}});
+      if(res.status === 403){ showHint(t.apiLimit, true); return; }
+      if(!res.ok){ showHint(t.noTracks, true); return; }
+
+      const data = await res.json();
+      const items = Array.isArray(data) ? data : [data];
+
+      const exts = [".mp3",".wav",".ogg",".m4a",".aac",".flac"];
+      tracks = items
+        .filter(x => x && x.type === "file" && typeof x.name === "string")
+        .filter(x => exts.some(e => x.name.toLowerCase().endsWith(e)))
+        .map(x => ({ name: x.name, url: x.download_url }));
+
+      plistCount.textContent = String(tracks.length);
+
+      if(!tracks.length){ showHint(t.noTracks, true); return; }
+
+      renderPlaylist();
+      loadIndex(0);
+      if(cfg.autoplay) audio.play().catch(()=>{});
+    }catch(e){
+      showHint(t.noTracks, true);
     }
-    $("cv").src = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(
-      "<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop stop-color='${cfg.accent}'/><stop offset='1' stop-color='${cfg.accent2}'/></linearGradient></defs><rect width='100%' height='100%' fill='url(#g)'/><circle cx='150' cy='150' r='92' fill='rgba(255,255,255,.18)'/><text x='50%' y='54%' text-anchor='middle' font-family='Arial' font-size='44' fill='white'>♪</text></svg>"
-    );
   }
 
-  function fmt(s){
-    s = Math.max(0, Math.floor(s||0));
-    const m = Math.floor(s/60);
-    const ss = String(s%60).padStart(2,"0");
-    return m+":"+ss;
+  function renderPlaylist(){
+    plistItems.innerHTML = "";
+    tracks.forEach((tr, i) => {
+      const row = document.createElement("div");
+      row.className = "track";
+      row.dataset.i = String(i);
+
+      const name = document.createElement("div");
+      name.className = "tname";
+      name.textContent = prettifyName(tr.name);
+
+      const badge = document.createElement("div");
+      badge.className = "badge";
+      badge.textContent = String(i+1);
+
+      row.appendChild(name);
+      row.appendChild(badge);
+
+      row.addEventListener("click", () => {
+        loadIndex(i);
+        audio.play().catch(()=>{});
+      });
+
+      plistItems.appendChild(row);
+    });
+    markActive();
   }
 
-  function rebuildOrder(){
-    const n = tracks.length;
-    order = Array.from({length:n}, (_,i)=>i);
+  function markActive(){
+    [...plistItems.querySelectorAll(".track")].forEach(el => {
+      el.classList.toggle("active", parseInt(el.dataset.i,10) === idx);
+    });
+  }
+
+  function loadIndex(i){
+    idx = clampInt(i, 0, tracks.length-1);
+    const tr = tracks[idx];
+    audio.src = tr.url;
+
+    trackTitle.textContent = prettifyName(tr.name);
+    trackSub.textContent = `${cfg.owner}/${cfg.repo}${cfg.path ? "/" + cfg.path : ""}`;
+
+    markActive();
+    updateProgress();
+  }
+
+  // Controls
+  btnPlay.addEventListener("click", () => {
+    if(audio.paused) audio.play().catch(()=>{});
+    else audio.pause();
+  });
+  btnPrev.addEventListener("click", prev);
+  btnNext.addEventListener("click", next);
+
+  btnShuffle.addEventListener("click", () => {
+    shuffle = !shuffle;
+    btnShuffle.classList.toggle("active", shuffle);
     if(shuffle){
-      for(let i=n-1;i>0;i--){
+      order = [...Array(tracks.length).keys()];
+      for(let i=order.length-1;i>0;i--){
         const j = Math.floor(Math.random()*(i+1));
         [order[i], order[j]] = [order[j], order[i]];
       }
+    }else{
+      order = [];
     }
-  }
-  function posInOrder(){
-    const p = order.indexOf(idx);
-    return p === -1 ? 0 : p;
-  }
-  function nextIdx(){
-    if(!tracks.length) return 0;
-    return order[(posInOrder()+1) % tracks.length];
-  }
-  function prevIdx(){
-    if(!tracks.length) return 0;
-    return order[(posInOrder()-1+tracks.length) % tracks.length];
-  }
+  });
 
-  function renderList(){
-    $("li").innerHTML = tracks.map((t,i)=>{
-      const cls = (i===idx) ? "it active" : "it";
-      return "<div class='"+cls+"' data-i='"+i+"'><div class='num'>"+String(i+1).padStart(2,"0")+
-             "</div><div class='nm'>"+escapeHtml(t.name)+"</div></div>";
-    }).join("");
+  btnPlaylist.addEventListener("click", () => playlistEl.classList.toggle("open"));
+  btnLike.addEventListener("click", () => btnLike.classList.toggle("active"));
 
-    [...$("li").querySelectorAll(".it")].forEach(el=>{
-      el.onclick = ()=>loadTrack(parseInt(el.getAttribute("data-i"),10), true);
-    });
-  }
+  document.addEventListener("click", (e) => {
+    const inside = playlistEl.contains(e.target) || btnPlaylist.contains(e.target);
+    if(!inside) playlistEl.classList.remove("open");
+  });
 
-  function setMeta(){
-    const t = tracks[idx];
-    if(!t){ $("tt").textContent="—"; $("sb").textContent="—"; return; }
-    const base = t.name.replace(EXT,"");
-    const parts = base.split(" - ");
-    $("tt").textContent = (parts[0] || base).trim();
-    $("sb").textContent = (parts.slice(1).join(" - ") || base).trim();
-  }
+  audio.addEventListener("play", () => {
+    icoPlay.innerHTML = `<path d="M6 5h4v14H6zM14 5h4v14h-4z"></path>`;
+  });
+  audio.addEventListener("pause", () => {
+    icoPlay.innerHTML = `<path d="M8 5v14l11-7z"></path>`;
+  });
+  audio.addEventListener("timeupdate", updateProgress);
+  audio.addEventListener("loadedmetadata", updateProgress);
+  audio.addEventListener("ended", () => next());
 
-  async function loadTrack(i, autoplay){
-    if(!tracks[i]) return;
-    idx = i;
-    a.src = tracks[i].url;
-    setMeta();
-    renderList();
+  // seek
+  let seeking = false;
+  seekBar.addEventListener("pointerdown", (e) => { seeking = true; seekToEvent(e); seekBar.setPointerCapture(e.pointerId); });
+  seekBar.addEventListener("pointermove", (e) => { if(seeking) seekToEvent(e); });
+  seekBar.addEventListener("pointerup", () => { seeking = false; });
 
-    await new Promise(res=>{
-      const on = ()=>{ a.removeEventListener("loadedmetadata", on); res(); };
-      a.addEventListener("loadedmetadata", on);
-      setTimeout(res, 800);
-    });
-
-    renderProg();
-    if(autoplay) play(); else setPlaying(false);
+  function seekToEvent(e){
+    if(!audio.duration || !isFinite(audio.duration)) return;
+    const rect = seekBar.getBoundingClientRect();
+    const x = Math.min(Math.max(0, e.clientX - rect.left), rect.width);
+    const p = x / rect.width;
+    audio.currentTime = p * audio.duration;
   }
 
-  function renderProg(){
-    const c = a.currentTime || 0;
-    const d = a.duration || 0;
-    $("tc").textContent = fmt(c);
-    $("td").textContent = d ? fmt(d) : "0:00";
-    $("rg").value = d ? String(Math.round((c/d)*1000)) : "0";
-  }
-
-  function setPlaying(on){
-    playing = on;
-    $("pp").textContent = on ? "⏸" : "▶";
-  }
-
-  async function play(){
+  function next(){
     if(!tracks.length) return;
-    try{
-      await a.play();
-      setPlaying(true);
-    }catch(e){
-      setPlaying(false);
+    if(shuffle && order.length){
+      const pos = order.indexOf(idx);
+      const nextIdx = order[(pos+1) % order.length];
+      loadIndex(nextIdx);
+    }else{
+      loadIndex((idx+1) % tracks.length);
+    }
+    audio.play().catch(()=>{});
+  }
+
+  function prev(){
+    if(!tracks.length) return;
+    if(shuffle && order.length){
+      const pos = order.indexOf(idx);
+      const prevIdx = order[(pos-1+order.length) % order.length];
+      loadIndex(prevIdx);
+    }else{
+      loadIndex((idx-1+tracks.length) % tracks.length);
+    }
+    audio.play().catch(()=>{});
+  }
+
+  function updateProgress(){
+    const ct = audio.currentTime || 0;
+    const dur = audio.duration || 0;
+    curTime.textContent = fmtTime(ct);
+    durTime.textContent = fmtTime(dur);
+    const p = dur ? (ct/dur) : 0;
+    barFill.style.width = (p*100).toFixed(2) + "%";
+    barKnob.style.left = (p*100).toFixed(2) + "%";
+  }
+
+  function showHint(text, show){
+    hint.textContent = text;
+    hint.classList.toggle("show", !!show);
+  }
+
+  // Visualization
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  let audioCtx, analyser, srcNode, freqData;
+
+  function initAudioCtx(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    freqData = new Uint8Array(analyser.frequencyBinCount);
+
+    srcNode = audioCtx.createMediaElementSource(audio);
+    srcNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    requestAnimationFrame(drawViz);
+  }
+
+  audio.addEventListener("play", () => {
+    initAudioCtx();
+    if(audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
+  });
+
+  function drawViz(){
+    requestAnimationFrame(drawViz);
+    if(!analyser) return;
+
+    analyser.getByteFrequencyData(freqData);
+
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+
+    ctx.fillStyle = "rgba(255,255,255,0.04)";
+    ctx.fillRect(0,0,w,h);
+
+    const bars = 58;
+    const step = Math.floor(freqData.length / bars);
+    const gap = 6;
+    const bw = (w - (bars+1)*gap) / bars;
+
+    const grad = ctx.createLinearGradient(0,0,w,0);
+    grad.addColorStop(0, cfg.accent);
+    grad.addColorStop(1, cfg.accent2);
+    ctx.fillStyle = grad;
+
+    for(let i=0;i<bars;i++){
+      const v = freqData[i*step] / 255;
+      const bh = Math.max(4, v * (h-14));
+      const x = gap + i*(bw+gap);
+      const y = h - bh - 7;
+      roundRect(ctx, x, y, bw, bh, 10);
+      ctx.fill();
     }
   }
-  function pause(){ a.pause(); setPlaying(false); }
-  function toggle(){ a.paused ? play() : pause(); }
 
-  function toggleShuffle(){
-    shuffle = !shuffle;
-    rebuildOrder();
-    $("sh").classList.toggle("active", shuffle);
+  function roundRect(c, x, y, w, h, r){
+    c.beginPath();
+    c.moveTo(x+r, y);
+    c.arcTo(x+w, y, x+w, y+h, r);
+    c.arcTo(x+w, y+h, x, y+h, r);
+    c.arcTo(x, y+h, x, y, r);
+    c.arcTo(x, y, x+w, y, r);
+    c.closePath();
   }
 
-  function toggleList(){
-    listOpen = !listOpen;
-    $("lw").classList.toggle("open", listOpen);
+  // helpers
+  function fmtTime(s){
+    if(!isFinite(s)) return "0:00";
+    const m = Math.floor(s/60);
+    const sec = Math.floor(s%60);
+    return `${m}:${String(sec).padStart(2,"0")}`;
+  }
+  function prettifyName(name){
+    return decodeURIComponent(name)
+      .replace(/\.[^.]+$/,"")
+      .replace(/[_]+/g," ")
+      .replace(/[-]+/g," ")
+      .trim();
+  }
+  function clamp01(x){ return isFinite(x) ? Math.min(1, Math.max(0, x)) : 0.8; }
+  function clampInt(x, a, b){ x = (x|0); return Math.min(b, Math.max(a, x)); }
+
+  function svgPlaceholder(c1, c2){
+    const svg =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="${c1}"/>
+            <stop offset="1" stop-color="${c2}"/>
+          </linearGradient>
+        </defs>
+        <rect width="240" height="240" rx="120" fill="url(#g)"/>
+        <circle cx="120" cy="115" r="52" fill="rgba(255,255,255,0.18)"/>
+        <path d="M108 92v52l44-26z" fill="rgba(255,255,255,0.82)"/>
+      </svg>`;
+    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
 
-  async function loadFromGithub(folderUrl){
-    $("err").textContent = "";
-    $("st").textContent = "…";
-    tracks = [];
-    renderList();
-
-    const api = toGithubApi(folderUrl);
-    if(!api){
-      $("err").textContent = ERR_TEXT;
-      $("st").textContent = "0";
-      return;
-    }
-
-    try{
-      const res = await fetch(api, { headers: { "Accept":"application/vnd.github+json" } });
-      if(!res.ok) throw new Error("fetch");
-      const data = await res.json();
-      const arr = Array.isArray(data) ? data : [data];
-
-      tracks = arr
-        .filter(f => f && f.type === "file" && f.download_url && EXT.test(f.name))
-        .map(f => ({ name: decodeURIComponent(f.name), url: f.download_url }));
-
-      $("st").textContent = String(tracks.length);
-
-      if(!tracks.length){
-        $("tt").textContent="—";
-        $("sb").textContent="—";
-        return;
-      }
-
-      idx = 0;
-      rebuildOrder();
-      renderList();
-      await loadTrack(0, false);
-    }catch(e){
-      $("err").textContent = ERR_TEXT;
-      $("st").textContent = "0";
-    }
-  }
-
-  function toGithubApi(url){
-    try{
-      const u = new URL(url);
-      if(u.hostname !== "github.com") return null;
-      const p = u.pathname.split("/").filter(Boolean);
-      const owner = p[0], repo = p[1];
-      if(!owner || !repo) return null;
-
-      let branch = "main";
-      let path = "";
-      const ti = p.indexOf("tree");
-      if(ti !== -1){
-        branch = p[ti+1] || "main";
-        path = p.slice(ti+2).join("/");
-      }
-      return "https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path+"?ref="+encodeURIComponent(branch);
-    }catch{
-      return null;
-    }
-  }
-
-  // UI events
-  $("pp").onclick = toggle;
-  $("nx").onclick = ()=>loadTrack(nextIdx(), playing);
-  $("pv").onclick = ()=>{
-    if((a.currentTime||0) > 3){ a.currentTime = 0; return; }
-    loadTrack(prevIdx(), playing);
-  };
-  $("sh").onclick = toggleShuffle;
-  $("plBtn").onclick = toggleList;
-
-  $("rg").oninput = ()=>{
-    const d = a.duration || 0;
-    if(!d) return;
-    a.currentTime = (parseInt($("rg").value,10)/1000) * d;
-    renderProg();
-  };
-
-  $("vv").oninput = ()=>{ a.volume = parseInt($("vv").value,10)/100; };
-  a.ontimeupdate = renderProg;
-  a.onended = ()=>loadTrack(nextIdx(), true);
-
-  // init
-  setCover();
-  loadFromGithub(GH_FOLDER);
-
-  function escapeHtml(str){
-    return String(str||"")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#39;");
-  }
+  // старт
+  loadTracks();
+})();
 </script>
-</body>
-</html>`;
-  }
-
-  function escapeHtml(s){
-    return String(s||"")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#39;");
-  }
-
-  // стартуем сразу
-  renderPreview();
-</script>
-
 </body>
 </html>
